@@ -1,0 +1,6 @@
+.reg-card {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    width: 250px;
+}

@@ -1,0 +1,5 @@
+.desc-text {
+  display: flex;
+  flex-direction: column;
+  font-size: x-large;
+}
