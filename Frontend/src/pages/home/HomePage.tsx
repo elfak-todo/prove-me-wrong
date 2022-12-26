@@ -1,14 +1,17 @@
-import Feed from "../../components/feed/Feed";
-import Search from "../../components/search/Search";
+import Topic from "../../components/topic/Topic";
 import "./HomePage.css";
 
 function HomePage() {
   return (
     <>
-      <div className="feed-div">
-        <Feed />
+      <div className="topics-div">
+        <Topic/>
+        <Topic/>
+        <Topic/>
+        <Topic/>
+        <Topic/>
+        <Topic/>
       </div>
-      <Search />
     </>
   );
 }

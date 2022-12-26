@@ -1,8 +1,4 @@
-import {
-  Card,
-  CardContent,
-  Typography,
-} from "@mui/material";
+import { Card, CardContent, Typography } from "@mui/material";
 import { useState } from "react";
 
 import CommentSection from "../commentSection/CommentSection";
@@ -13,13 +9,12 @@ function Post() {
   const [isExpanded, setIsExpanded] = useState(false);
 
   return (
-    <Card sx={{ maxWidth: 700, marginTop: 5}} >
+    <Card sx={{ maxWidth: 700, marginTop: 5 }}>
       <PostHeader />
       <CardContent>
         <Typography variant="body2">
-          This impressive paella is a perfect party dish and a fun meal to cook
-          together with your guests. Add 1 cup of frozen peas along with the
-          mussels, if you like.
+          Programeryy će preživeti i web3 i chatGPT jer im se može. Ne učimo za
+          džabe fagzz. Ne gubite nadu, poz.
         </Typography>
       </CardContent>
       <PostFooter isExpanded={isExpanded} setIsExpanded={setIsExpanded} />

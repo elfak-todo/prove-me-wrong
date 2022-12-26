@@ -5,7 +5,6 @@ import {
   Box,
   Paper,
 } from "@mui/material";
-import TopicIcon from "@mui/icons-material/Topic";
 import AccountBoxIcon from "@mui/icons-material/AccountBox";
 import LogoutIcon from "@mui/icons-material/Logout";
 import HomeIcon from "@mui/icons-material/Home";
@@ -29,11 +28,6 @@ function Navbar() {
             label="Početna strana"
             icon={<HomeIcon />}
             onClick={() => navigate("/home")}
-          />
-          <BottomNavigationAction
-            sx={{ color: "white" }}
-            label="Teme"
-            icon={<TopicIcon />}
           />
           <BottomNavigationAction
             sx={{ color: "white" }}

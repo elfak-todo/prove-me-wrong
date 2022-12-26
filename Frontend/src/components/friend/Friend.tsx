@@ -5,6 +5,7 @@ import {
   Card,
   Typography,
 } from "@mui/material";
+import PersonAddIcon from '@mui/icons-material/PersonAdd';
 import lukaImg from "../../images/luka.jpg";
 
 function Friend() {
@@ -31,7 +32,7 @@ function Friend() {
           </Typography>
         </Box>
 
-        <Button variant="outlined" size="small">
+        <Button variant="outlined" size="small" startIcon={<PersonAddIcon />}>
           Pošalji zahtev
         </Button>
       </Box>
