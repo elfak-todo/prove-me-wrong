@@ -15,7 +15,6 @@ function CommentForm() {
         fullWidth
         multiline
         rows={1}
-        maxRows={3}
         placeholder="Ostavi komentar"
       />
     </Stack>
