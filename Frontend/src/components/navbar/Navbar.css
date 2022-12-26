@@ -1,0 +1,6 @@
+.navbar-main {
+    width: fit-content;
+    margin-left: auto;
+    margin-right: auto;
+    z-index: 9000;
+}

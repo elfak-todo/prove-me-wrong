@@ -25,7 +25,7 @@ function PostFooter({ isExpanded, setIsExpanded }: PostFooterProps) {
         123
       </>
       <>
-        <IconButton>
+        <IconButton onClick={() => setIsExpanded(!isExpanded)}>
           <ModeCommentIcon />
         </IconButton>
         54

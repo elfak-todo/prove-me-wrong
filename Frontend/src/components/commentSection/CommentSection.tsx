@@ -8,7 +8,7 @@ interface CommentSectionProps {
 
 function CommentSection({ isExpanded }: CommentSectionProps) {
   return (
-    <Collapse in={isExpanded} collapsedSize={60}>
+    <Collapse in={isExpanded} collapsedSize={55}>
       <CardContent sx={{ padding: 1 }}>
         <CommentForm />
         <Comment />
