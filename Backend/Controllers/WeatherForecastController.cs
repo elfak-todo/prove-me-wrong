@@ -18,8 +18,8 @@ public class WeatherForecastController : ControllerBase
         _logger = logger;
     }
 
-    [HttpGet(Name = "GetWeatherForecast")]
-    public IEnumerable<Object>? Get(string message)
+    [HttpGet(Name = "CreateTestNode")]
+    public IEnumerable<Object>? CreateTestNode(string message)
     {
         using var session = _driver.Session();
         var greeting = session.ExecuteWrite(tx =>
