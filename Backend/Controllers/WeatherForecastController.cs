@@ -1,4 +1,5 @@
 using Microsoft.AspNetCore.Mvc;
+using Neo4j.Driver;
 
 namespace Backend.Controllers;
 
@@ -6,27 +7,30 @@ namespace Backend.Controllers;
 [Route("[controller]")]
 public class WeatherForecastController : ControllerBase
 {
-    private static readonly string[] Summaries = new[]
-    {
-        "Freezing", "Bracing", "Chilly", "Cool", "Mild", "Warm", "Balmy", "Hot", "Sweltering", "Scorching"
-    };
+
+    private readonly IDriver _driver;
 
     private readonly ILogger<WeatherForecastController> _logger;
 
     public WeatherForecastController(ILogger<WeatherForecastController> logger)
     {
+        _driver = GraphDatabase.Driver("neo4j://localhost:7687", AuthTokens.Basic("neo4j", "neo4jneo4j"));
         _logger = logger;
     }
 
     [HttpGet(Name = "GetWeatherForecast")]
-    public IEnumerable<WeatherForecast> Get()
+    public IEnumerable<Object>? Get(string message)
     {
-        return Enumerable.Range(1, 5).Select(index => new WeatherForecast
+        using var session = _driver.Session();
+        var greeting = session.ExecuteWrite(tx =>
         {
-            Date = DateOnly.FromDateTime(DateTime.Now.AddDays(index)),
-            TemperatureC = Random.Shared.Next(-20, 55),
-            Summary = Summaries[Random.Shared.Next(Summaries.Length)]
-        })
-        .ToArray();
+            var result = tx.Run("CREATE (a:Greeting) " +
+                                "SET a.message = $message " +
+                                "RETURN a.message + ', from node ' + id(a)",
+                new { message });
+            return result.Single()[0].As<string>();
+        });
+        Console.WriteLine(greeting);
+        return null;
     }
 }
