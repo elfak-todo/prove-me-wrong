@@ -1,7 +1,6 @@
 using Microsoft.AspNetCore.Mvc;
 using Redis.OM.Searching;
 using Redis.OM;
-using Backend.Models;
 
 namespace Backend.Controllers;
 
@@ -9,7 +8,6 @@ namespace Backend.Controllers;
 [Route("[controller]")]
 public class Person : ControllerBase
 {
-
     private readonly RedisCollection<Models.Person> _people;
     private readonly RedisConnectionProvider _provider;
     public Person(RedisConnectionProvider provider)

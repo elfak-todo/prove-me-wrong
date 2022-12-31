@@ -1,5 +1,6 @@
 using Backend.Services;
 using Redis.OM;
+using Neo4j.Driver;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -13,6 +14,13 @@ builder.Services.AddSwaggerGen();
 builder.Services.AddHostedService<IndexCreationService>();
 
 builder.Services.AddSingleton(new RedisConnectionProvider(builder.Configuration["RedisConnectionString"]!));
+
+builder.Services.AddSingleton(GraphDatabase.Driver(builder.Configuration["Neo4jConnectionString"]!,
+        AuthTokens.Basic(builder.Configuration["Neo4jUsername"]!,
+        builder.Configuration["Neo4jPassword"]!)));
+
+//Services
+builder.Services.AddScoped<IUserService, UserService>();
 
 var app = builder.Build();
 

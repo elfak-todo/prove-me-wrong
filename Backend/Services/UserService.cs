@@ -1,24 +1,27 @@
-using Microsoft.AspNetCore.Mvc;
 using Neo4j.Driver;
+using Redis.OM.Searching;
+using Redis.OM;
 
-namespace Backend.Controllers;
+namespace Backend.Services;
 
-[ApiController]
-[Route("[controller]")]
-public class WeatherForecastController : ControllerBase
+public interface IUserService
 {
+    IEnumerable<Object>? CreateTestNode(string name);
+}
 
+public class UserService : IUserService
+{
     private readonly IDriver _driver;
+    private readonly RedisCollection<Models.Person> _people;
+    private readonly RedisConnectionProvider _provider;
 
-    private readonly ILogger<WeatherForecastController> _logger;
-
-    public WeatherForecastController(ILogger<WeatherForecastController> logger)
+    public UserService(IDriver driver, RedisConnectionProvider provider)
     {
-        _driver = GraphDatabase.Driver("neo4j://localhost:7687", AuthTokens.Basic("neo4j", "neo4jneo4j"));
-        _logger = logger;
+        _driver = driver;
+        _provider = provider;
+        _people = (RedisCollection<Models.Person>)provider.RedisCollection<Models.Person>();
     }
 
-    [HttpGet(Name = "CreateTestNode")]
     public IEnumerable<Object>? CreateTestNode(string message)
     {
         using var session = _driver.Session();
