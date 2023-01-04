@@ -1,6 +1,6 @@
 using Backend.Services;
 using Redis.OM;
-using Neo4j.Driver;
+using Neo4jClient;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -15,9 +15,12 @@ builder.Services.AddHostedService<IndexCreationService>();
 
 builder.Services.AddSingleton(new RedisConnectionProvider(builder.Configuration["RedisConnectionString"]!));
 
-builder.Services.AddSingleton(GraphDatabase.Driver(builder.Configuration["Neo4jConnectionString"]!,
-        AuthTokens.Basic(builder.Configuration["Neo4jUsername"]!,
-        builder.Configuration["Neo4jPassword"]!)));
+var client = new BoltGraphClient(builder.Configuration["Neo4jConnectionString"]!,
+        builder.Configuration["Neo4jUsername"]!,
+        builder.Configuration["Neo4jPassword"]!);
+
+client.ConnectAsync();
+builder.Services.AddSingleton<IGraphClient>(client);
 
 //Services
 builder.Services.AddScoped<IUserService, UserService>();

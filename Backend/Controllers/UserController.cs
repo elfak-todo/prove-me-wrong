@@ -1,5 +1,7 @@
 using Microsoft.AspNetCore.Mvc;
 using Backend.Services;
+using Backend.Models;
+using Neo4jClient;
 
 namespace Backend.Controllers;
 
@@ -8,15 +10,16 @@ namespace Backend.Controllers;
 public class UserController : ControllerBase
 {
     private readonly IUserService _userService;
-
-    public UserController(IUserService userService)
+    private readonly IGraphClient _client;
+    public UserController(IGraphClient client, IUserService userService)
     {
-        _userService = userService;
+        _client = client;
+         _userService = userService;
     }
 
     [HttpPost]
-    public IEnumerable<Object>? CreateTestNode(string message)
+    public async Task<IActionResult> Create([FromBody] User user)
     {
-        return _userService.CreateTestNode(message);
+        return Ok(await _userService.CreateUser(user));
     }
 }

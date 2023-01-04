@@ -1,39 +1,34 @@
-using Neo4j.Driver;
 using Redis.OM.Searching;
 using Redis.OM;
+using Neo4jClient;
+using Backend.Models;
+using Microsoft.AspNetCore.Mvc;
 
 namespace Backend.Services;
 
 public interface IUserService
 {
-    IEnumerable<Object>? CreateTestNode(string name);
+    Task<User?> CreateUser(User user);
 }
 
 public class UserService : IUserService
 {
-    private readonly IDriver _driver;
+    private readonly IGraphClient _client;
     private readonly RedisCollection<Models.Person> _people;
     private readonly RedisConnectionProvider _provider;
 
-    public UserService(IDriver driver, RedisConnectionProvider provider)
+    public UserService(IGraphClient client, RedisConnectionProvider provider)
     {
-        _driver = driver;
+        _client = client;
         _provider = provider;
         _people = (RedisCollection<Models.Person>)provider.RedisCollection<Models.Person>();
     }
 
-    public IEnumerable<Object>? CreateTestNode(string message)
+    public async Task<User?> CreateUser(User user)
     {
-        using var session = _driver.Session();
-        var greeting = session.ExecuteWrite(tx =>
-        {
-            var result = tx.Run("CREATE (a:Greeting) " +
-                                "SET a.message = $message " +
-                                "RETURN a.message + ', from node ' + id(a)",
-                new { message });
-            return result.Single()[0].As<string>();
-        });
-        Console.WriteLine(greeting);
+        await _client.Cypher.Create("(u:User $user)")
+                    .WithParam("user", user)
+                    .ExecuteWithoutResultsAsync();
         return null;
     }
 }
