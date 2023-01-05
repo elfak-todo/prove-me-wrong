@@ -4,14 +4,39 @@ import {
   DialogContent,
   DialogTitle,
   TextField,
-} from "@mui/material";
-import { Stack } from "@mui/system";
+} from '@mui/material';
+import { Stack } from '@mui/system';
+import { Dispatch, useState, MouseEvent } from 'react';
+import { ITopic } from '../../models/topic';
+import { createTopic } from '../../services/topic.service';
 
 interface TopicFormProps {
-  setIsOpen: any;
+  setIsOpen: Dispatch<React.SetStateAction<boolean>>;
+  feed: ITopic[];
+  setFeed: Dispatch<React.SetStateAction<ITopic[]>>;
 }
 
-function TopicForm({ setIsOpen }: TopicFormProps) {
+function TopicForm({ setIsOpen, feed, setFeed }: TopicFormProps) {
+  const [topic, setTopic] = useState<ITopic>({
+    title: '',
+    description: '',
+  });
+
+  const handlePost = (event: MouseEvent<HTMLButtonElement>) => {
+    event.stopPropagation();
+
+    const { title, description } = topic;
+
+    if (title === '' || description === '') return;
+
+    console.log(feed);
+    createTopic(topic)
+      .then(({ data }) => setFeed([...feed, data]))
+      .catch(({ error }) => console.log(error));
+
+    setIsOpen(false);
+  };
+
   return (
     <>
       <DialogTitle>Kreiranje teme za diskusiju</DialogTitle>
@@ -23,6 +48,9 @@ function TopicForm({ setIsOpen }: TopicFormProps) {
             label="Tema"
             fullWidth
             variant="outlined"
+            onChange={(event) =>
+              setTopic({ ...topic, title: event.target.value })
+            }
           />
           <TextField
             margin="dense"
@@ -31,11 +59,14 @@ function TopicForm({ setIsOpen }: TopicFormProps) {
             multiline
             rows={4}
             variant="outlined"
+            onChange={(event) =>
+              setTopic({ ...topic, description: event.target.value })
+            }
           />
         </Stack>
       </DialogContent>
       <DialogActions>
-        <Button onClick={() => setIsOpen(false)} variant="contained">
+        <Button onClick={handlePost} variant="contained">
           Kreiraj
         </Button>
         <Button onClick={() => setIsOpen(false)} variant="outlined">

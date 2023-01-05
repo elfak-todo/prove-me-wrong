@@ -5,7 +5,7 @@ namespace Backend.Services;
 public interface IPostService
 {
     Task<List<Post>> GetFeed(string topicID);
-    Task<ServiceResult<Post>> Create(string topicID, Post postData);
+    Task<ServiceResult<Post>> Create(string authorID, string topicID, Post postData);
     Task<ServiceResult<Post>> Delete(string id);
 }
 
@@ -28,7 +28,7 @@ public class PostService : IPostService
         return posts.ToList();
     }
 
-    public async Task<ServiceResult<Post>> Create(string topicID, Post postData)
+    public async Task<ServiceResult<Post>> Create(string authorID, string topicID, Post postData)
     {
         postData.ID = Guid.NewGuid().ToString();
         postData.DatePublished = DateTime.Now;
@@ -38,16 +38,20 @@ public class PostService : IPostService
                                     .Return(topic => topic.As<Topic>()).ResultsAsync;
 
         if (topic.SingleOrDefault() == null)
-            return new ServiceResult<Post>
-            {
-                StatusCode = ServiceStatusCode.NotFound,
-                ErrorMessage = "TopicNotFound"
-            };
+            return new ServiceResult<Post> { StatusCode = ServiceStatusCode.NotFound, ErrorMessage = "TopicNotFound" };
 
-        var newPost = await _client.Cypher.Match("(topic:Topic)")
+        var author = await _userService.GetById(authorID);
+
+        if (author.Result == null)
+            return new ServiceResult<Post> { StatusCode = ServiceStatusCode.NotFound, ErrorMessage = "UserInvalid" };
+
+
+        var newPost = await _client.Cypher.Match("(topic:Topic), (user:User)")
                                     .Where((Topic topic) => topic.ID == topicID)
+                                    .AndWhere((User user) => user.ID == authorID)
                                     .Create("(post:Post $postData)-[:RELATED_TO]->(topic)")
                                     .WithParam("postData", postData)
+                                    .Create("(post)-[:POSTED_BY]->(user)")
                                     .Return(post => post.As<Post>()).ResultsAsync;
 
         return new ServiceResult<Post>
@@ -64,20 +68,12 @@ public class PostService : IPostService
                                     .Return(post => post.As<Post>()).ResultsAsync;
 
         if (post.FirstOrDefault() == null)
-            return new ServiceResult<Post>
-            {
-                StatusCode = ServiceStatusCode.NotFound,
-                ErrorMessage = "PostNotFound"
-            };
+            return new ServiceResult<Post> { StatusCode = ServiceStatusCode.NotFound, ErrorMessage = "PostNotFound" };
 
         await _client.Cypher.Match("(post:Post)")
                                     .Where((Post post) => post.ID == id)
                                     .DetachDelete("post").ExecuteWithoutResultsAsync();
 
-        return new ServiceResult<Post>
-        {
-            Result = post.FirstOrDefault(),
-            StatusCode = ServiceStatusCode.Success
-        };
+        return new ServiceResult<Post> { Result = post.FirstOrDefault(), StatusCode = ServiceStatusCode.Success };
     }
 }

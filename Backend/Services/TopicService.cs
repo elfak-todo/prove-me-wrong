@@ -6,14 +6,16 @@ public interface ITopicService
 {
     Task<List<Topic>> GetAll();
     Task<Topic?> Get(string id);
-    Task<Topic> Create(Topic topic);
+    Task<ServiceResult<Topic>> Create(string authorID, Topic topicData);
 }
 public class TopicService : ITopicService
 {
     private readonly IGraphClient _client;
-    public TopicService(IGraphClient client)
+    private readonly IUserService _userService;
+    public TopicService(IGraphClient client, IUserService userService)
     {
         _client = client;
+        _userService = userService;
     }
 
     public async Task<List<Topic>> GetAll()
@@ -33,15 +35,24 @@ public class TopicService : ITopicService
         return topic.SingleOrDefault();
     }
 
-    public async Task<Topic> Create(Topic topic)
+    public async Task<ServiceResult<Topic>> Create(string authorID, Topic topicData)
     {
-        topic.ID = Guid.NewGuid().ToString();
-        topic.DatePublished = DateTime.Now;
+        var author = await _userService.GetById(authorID);
 
-        var newTopic = await _client.Cypher.Create("(t: Topic $topic)")
-                                .WithParam("topic", topic)
-                                .Return(t => t.As<Topic>()).ResultsAsync;
+        if (author.Result == null)
+            return new ServiceResult<Topic> { StatusCode = ServiceStatusCode.NotFound, ErrorMessage = "InvalidUser" };
 
-        return newTopic.Single();
+
+        topicData.ID = Guid.NewGuid().ToString();
+        topicData.DatePublished = DateTime.Now;
+
+        var newTopic = await _client.Cypher.Match("(user:User)")
+                                    .Where((User user) => user.ID == authorID)
+                                    .Create("(topic:Topic $topicData)-[:CREATED_BY]->(user)")
+                                    .WithParam("topicData", topicData)
+                                    .Return(topic => topic.As<Topic>()).ResultsAsync;
+
+
+        return new ServiceResult<Topic> { Result = newTopic.Single(), StatusCode = ServiceStatusCode.Success };
     }
 }

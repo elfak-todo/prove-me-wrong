@@ -1,20 +1,26 @@
-import { Dialog, Fab } from "@mui/material";
-import AddIcon from "@mui/icons-material/Add";
-import { useLocation } from "react-router";
-import { useState } from "react";
+import { Dialog, Fab } from '@mui/material';
+import AddIcon from '@mui/icons-material/Add';
+import { useLocation } from 'react-router';
+import { Dispatch, useState } from 'react';
 
-import PostForm from "../postForm/PostForm";
-import TopicForm from "../topicForm/TopicForm";
+import PostForm from '../postForm/PostForm';
+import TopicForm from '../topicForm/TopicForm';
+import { ITopic } from '../../models/topic';
 
-function Create() {
+interface CreateProps {
+  feed: ITopic[];
+  setFeed: Dispatch<React.SetStateAction<ITopic[]>>;
+}
+
+function Create({ feed, setFeed }: CreateProps) {
   const { pathname } = useLocation();
   const [isOpen, setIsOpen] = useState<boolean>(false);
 
-  return pathname === "/home" || pathname === "/topic" ? (
+  return pathname === '/home' || pathname === '/topic' ? (
     <>
       <Fab
         sx={{
-          position: "fixed",
+          position: 'fixed',
           top: 80,
           left: 10,
         }}
@@ -29,10 +35,10 @@ function Create() {
         fullWidth
         maxWidth="md"
       >
-        {pathname === "/topic" ? (
+        {pathname === '/topic' ? (
           <PostForm setIsOpen={setIsOpen} />
-        ) : pathname === "/home" ? (
-          <TopicForm setIsOpen={setIsOpen} />
+        ) : pathname === '/home' ? (
+          <TopicForm setIsOpen={setIsOpen} feed={feed} setFeed={setFeed} />
         ) : null}
       </Dialog>
     </>

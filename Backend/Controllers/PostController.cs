@@ -27,7 +27,7 @@ public class PostController : ControllerBase
     [HttpPost]
     public async Task<ActionResult> Create([FromBody] Post post, string topicID)
     {
-        var res = await _postService.Create(topicID, post);
+        var res = await _postService.Create((string?)HttpContext.Items["UserID"]!, topicID, post);
 
         if (res.StatusCode != ServiceStatusCode.Success)
             return BadRequest(res.ErrorMessage);

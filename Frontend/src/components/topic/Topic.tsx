@@ -6,32 +6,39 @@ import {
   CardHeader,
   Collapse,
   Typography,
-} from "@mui/material";
-import { useState } from "react";
-import { useNavigate } from "react-router";
-import ExpandMore from "../expandMore/ExpandMore";
-import ExpandMoreIcon from "@mui/icons-material/ExpandMore";
-import Friend from "../friend/Friend";
+} from '@mui/material';
+import { useState } from 'react';
+import { useNavigate } from 'react-router';
+import { ITopic } from '../../models/topic';
+import ExpandMore from '../expandMore/ExpandMore';
+import ExpandMoreIcon from '@mui/icons-material/ExpandMore';
+import Friend from '../friend/Friend';
 
-import "./Topic.css";
+import './Topic.css';
+import { dateSrp } from '../../dateParser';
 
-function Topic() {
+interface TopicProps {
+  topic: ITopic;
+}
+
+function Topic({ topic }: TopicProps) {
   const [isExpanded, setIsExpanded] = useState(false);
   const navigate = useNavigate();
+
   return (
     <Card
-      sx={{ maxWidth: 800, minWidth: 600, mt: 3, bgcolor: "primary.light" }}
+      sx={{ maxWidth: 800, minWidth: 600, mt: 3, bgcolor: 'primary.light' }}
     >
       <CardHeader
         title={
           <Typography variant="h6" color="white">
-            <strong> ChatGPT genocid nad programerima?</strong>
+            <strong> {topic.title}</strong>
           </Typography>
         }
-        subheader="Diskusija započeta 26. Decembar 2022."
+        subheader={`Diskusija započeta: ${topic.datePublished && dateSrp(topic.datePublished)}`}
         action={
           <>
-            <Button variant="contained" onClick={() => navigate("/topic")}>
+            <Button variant="contained" onClick={() => navigate('/topic')}>
               Istraži
             </Button>
             <ExpandMore
@@ -47,10 +54,7 @@ function Topic() {
       <Collapse in={isExpanded}>
         <CardContent>
           <Typography variant="body1" color="white">
-            Veštačka inteligencija je alat koji u velikoj meri utiče na
-            savremenu ljudsku svakodnevicu i olakšava nam veliki broj radnji
-            koje obavljamo, ali veštačka inteligencija, u isto vreme, jeste i
-            pojam koji neretko ima loš prizvuk.
+            {topic.description}
           </Typography>
         </CardContent>
       </Collapse>

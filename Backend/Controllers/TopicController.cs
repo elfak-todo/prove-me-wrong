@@ -32,6 +32,11 @@ public class TopicController : ControllerBase
     [HttpPost]
     public async Task<ActionResult> Create([FromBody] Topic topic)
     {
-        return Ok(await _topicService.Create(topic));
+        var res = await _topicService.Create((string?)HttpContext.Items["UserID"]!, topic);
+
+        if (res.StatusCode != ServiceStatusCode.Success)
+            return BadRequest(res.ErrorMessage);
+
+        return Ok(res.Result);
     }
 }
