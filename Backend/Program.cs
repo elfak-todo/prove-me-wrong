@@ -19,6 +19,8 @@ builder.Services.AddSingleton<IGraphClient>(client);
 
 //Services
 builder.Services.AddScoped<IUserService, UserService>();
+builder.Services.AddScoped<ITopicService, TopicService>();
+builder.Services.AddScoped<IPostService, PostService>();
 
 builder.Services.AddCors(options =>
 {

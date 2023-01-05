@@ -2,7 +2,6 @@ using Microsoft.AspNetCore.Mvc;
 using Backend.Services;
 using Backend.Models;
 using Backend.Attributes;
-using Neo4jClient;
 
 namespace Backend.Controllers;
 
@@ -12,10 +11,8 @@ namespace Backend.Controllers;
 public class UserController : ControllerBase
 {
     private readonly IUserService _userService;
-    private readonly IGraphClient _client;
-    public UserController(IGraphClient client, IUserService userService)
+    public UserController(IUserService userService)
     {
-        _client = client;
         _userService = userService;
     }
 
