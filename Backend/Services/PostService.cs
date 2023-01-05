@@ -12,9 +12,11 @@ public interface IPostService
 public class PostService : IPostService
 {
     private readonly IGraphClient _client;
-    public PostService(IGraphClient client)
+    private readonly IUserService _userService;
+    public PostService(IGraphClient client, IUserService userService)
     {
         _client = client;
+        _userService = userService;
     }
 
     public async Task<List<Post>> GetFeed(string topicID)
@@ -28,8 +30,7 @@ public class PostService : IPostService
 
     public async Task<ServiceResult<Post>> Create(string topicID, Post postData)
     {
-        Guid guid = Guid.NewGuid();
-        postData.ID = guid.ToString();
+        postData.ID = Guid.NewGuid().ToString();
         postData.DatePublished = DateTime.Now;
 
         var topic = await _client.Cypher.Match("(topic:Topic)")

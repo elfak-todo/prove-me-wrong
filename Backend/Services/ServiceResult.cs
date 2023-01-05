@@ -2,6 +2,7 @@ public enum ServiceStatusCode
 {
     Success,
     NotFound,
+    FieldsMissing,
     Other
 }
 

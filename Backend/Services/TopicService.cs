@@ -35,8 +35,7 @@ public class TopicService : ITopicService
 
     public async Task<Topic> Create(Topic topic)
     {
-        Guid guid = Guid.NewGuid();
-        topic.ID = guid.ToString();
+        topic.ID = Guid.NewGuid().ToString();
         topic.DatePublished = DateTime.Now;
 
         var newTopic = await _client.Cypher.Create("(t: Topic $topic)")

@@ -16,19 +16,40 @@ public class UserController : ControllerBase
         _userService = userService;
     }
 
-    [HttpPost]
-    public async Task<IActionResult> Create([FromBody] User user)
+    [AllowAnonymous]
+    [HttpGet("{id}")]
+    public async Task<IActionResult> GetUserById(string id)
     {
-        Console.WriteLine(HttpContext.Items["UserID"]);
+        var res = await _userService.GetById(id);
 
-        return Ok(await _userService.CreateUser(user));
+        if (res.StatusCode != ServiceStatusCode.Success)
+            return BadRequest(res.ErrorMessage);
+
+        return Ok(res.Result);
     }
 
     [AllowAnonymous]
-    [HttpPost("/login")]
+    [Route("register")]
+    [HttpPost]
+    public async Task<IActionResult> Register([FromBody] UserRegisterData regData)
+    {
+        var res = await _userService.Register(regData);
+
+        if (!res.Result)
+            return BadRequest(res.ErrorMessage);
+
+        return Ok();
+    }
+
+    [AllowAnonymous]
+    [HttpPost("login")]
     public async Task<IActionResult> Login([FromBody] UserLoginCreds user)
     {
-        UserDetails? userDetails = await _userService.Login(user);
-        return Ok(userDetails);
+        var res = await _userService.Login(user);
+
+        if (res.StatusCode != ServiceStatusCode.Success)
+            return BadRequest(res.ErrorMessage);
+
+        return Ok(res.Result);
     }
 }

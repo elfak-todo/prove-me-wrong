@@ -1,9 +1,11 @@
 using Backend.Models;
 using Backend.Services;
 using Microsoft.AspNetCore.Mvc;
+using Backend.Attributes;
 
 namespace Backend.Controllers;
 
+[Authorize]
 [ApiController]
 [Route("[controller]")]
 public class PostController : ControllerBase
