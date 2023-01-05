@@ -1,45 +1,49 @@
-import { useLocation, useNavigate } from "react-router";
+import { useLocation, useNavigate } from 'react-router';
 import {
   BottomNavigation,
   BottomNavigationAction,
   Box,
   Paper,
-} from "@mui/material";
-import AccountBoxIcon from "@mui/icons-material/AccountBox";
-import LogoutIcon from "@mui/icons-material/Logout";
-import HomeIcon from "@mui/icons-material/Home";
+} from '@mui/material';
+import AccountBoxIcon from '@mui/icons-material/AccountBox';
+import LogoutIcon from '@mui/icons-material/Logout';
+import HomeIcon from '@mui/icons-material/Home';
 
-import "./Navbar.css";
+import './Navbar.css';
+import UserContext from '../userManager/UserManager';
+import { useContext } from 'react';
 
 function Navbar() {
   const navigate = useNavigate();
   const location = useLocation();
 
-  return location.pathname !== "/" && location.pathname !== "/register" ? (
+  const { setUser } = useContext(UserContext);
+
+  return location.pathname !== '/' && location.pathname !== '/register' ? (
     <Paper
-      sx={{ position: "fixed", bottom: 10, left: 0, right: 0 }}
+      sx={{ position: 'fixed', bottom: 10, left: 0, right: 0 }}
       className="navbar-main"
       elevation={3}
     >
       <Box sx={{ width: 500 }}>
-        <BottomNavigation showLabels sx={{ bgcolor: "primary.dark" }}>
+        <BottomNavigation showLabels sx={{ bgcolor: 'primary.dark' }}>
           <BottomNavigationAction
-            sx={{ color: "white" }}
+            sx={{ color: 'white' }}
             label="Početna strana"
             icon={<HomeIcon />}
-            onClick={() => navigate("/home")}
+            onClick={() => navigate('/home')}
           />
           <BottomNavigationAction
-            sx={{ color: "white" }}
+            sx={{ color: 'white' }}
             label="Profil"
             icon={<AccountBoxIcon />}
-            onClick={() => navigate("/profile")}
+            onClick={() => navigate('/profile')}
           />
           <BottomNavigationAction
-            sx={{ color: "white" }}
+            sx={{ color: 'white' }}
             label="Odjavi se"
             icon={<LogoutIcon />}
-            onClick={() => navigate("/", { replace: true })}
+            onClick={() => setUser(null)}
           />
         </BottomNavigation>
       </Box>

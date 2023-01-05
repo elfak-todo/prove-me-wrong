@@ -21,7 +21,9 @@ public class UserService : IUserService
     private readonly RedisConnectionProvider _provider;
     private readonly IPasswordManager _passwordManager;
 
-    public UserService(IGraphClient client, RedisConnectionProvider provider, IPasswordManager passwordManager)
+    public UserService(IGraphClient client,
+                        RedisConnectionProvider provider,
+                        IPasswordManager passwordManager)
     {
         _client = client;
         _provider = provider;
@@ -38,9 +40,17 @@ public class UserService : IUserService
         var user = res.FirstOrDefault();
 
         if (user == null)
-            return new ServiceResult<User> { StatusCode = ServiceStatusCode.NotFound, ErrorMessage = "StudentNotFound" };
+            return new ServiceResult<User>
+            {
+                StatusCode = ServiceStatusCode.NotFound,
+                ErrorMessage = "StudentNotFound"
+            };
 
-        return new ServiceResult<User> { Result = user, StatusCode = ServiceStatusCode.Success };
+        return new ServiceResult<User>
+        {
+            Result = user,
+            StatusCode = ServiceStatusCode.Success
+        };
     }
 
     public async Task<ServiceResult<bool>> Register(UserRegisterData regData)
@@ -77,7 +87,11 @@ public class UserService : IUserService
 
         var res = await Authenticate(user.Username, user.Password);
         if (res.Result == null)
-            return new ServiceResult<UserDetails> { StatusCode = res.StatusCode, ErrorMessage = res.ErrorMessage };
+            return new ServiceResult<UserDetails>
+            {
+                StatusCode = res.StatusCode,
+                ErrorMessage = res.ErrorMessage
+            };
 
         User authUser = res.Result;
 
@@ -86,7 +100,14 @@ public class UserService : IUserService
 
         return new ServiceResult<UserDetails>
         {
-            Result = new UserDetails { ID = authUser.ID, Username = authUser.Username, FirstName = authUser.FirstName, LastName = authUser.LastName, AccessToken = AccessToken },
+            Result = new UserDetails
+            {
+                ID = authUser.ID,
+                Username = authUser.Username,
+                FirstName = authUser.FirstName,
+                LastName = authUser.LastName,
+                AccessToken = AccessToken
+            },
             StatusCode = ServiceStatusCode.Success
         };
     }
@@ -94,7 +115,11 @@ public class UserService : IUserService
     public async Task<ServiceResult<User>> Authenticate(string username, string password)
     {
         if (username == null || password == null)
-            return new ServiceResult<User> { StatusCode = ServiceStatusCode.FieldsMissing, ErrorMessage = "FieldsMissing" };
+            return new ServiceResult<User>
+            {
+                StatusCode = ServiceStatusCode.FieldsMissing,
+                ErrorMessage = "FieldsMissing"
+            };
 
         var query = await _client.Cypher.Match("(user:User)")
                                     .Where((User user) => user.Username == username)
@@ -103,14 +128,28 @@ public class UserService : IUserService
         var user = query.FirstOrDefault();
 
         if (user == null)
-            return new ServiceResult<User> { StatusCode = ServiceStatusCode.NotFound, ErrorMessage = "UserNotFound" };
+            return new ServiceResult<User>
+            {
+                StatusCode = ServiceStatusCode.NotFound,
+                ErrorMessage = "UserNotFound"
+            };
 
         if (!_passwordManager.VerifyPassword(password, user.Password))
-            return new ServiceResult<User> { StatusCode = ServiceStatusCode.Other, ErrorMessage = "InvalidPassword" };
+            return new ServiceResult<User>
+            {
+                StatusCode = ServiceStatusCode.Other,
+                ErrorMessage = "InvalidPassword"
+            };
 
         return new ServiceResult<User>
         {
-            Result = new User { ID = user.ID!, Username = user.Username, FirstName = user.FirstName, LastName = user.LastName },
+            Result = new User
+            {
+                ID = user.ID!,
+                Username = user.Username,
+                FirstName = user.FirstName,
+                LastName = user.LastName
+            },
             StatusCode = ServiceStatusCode.Success
         };
     }

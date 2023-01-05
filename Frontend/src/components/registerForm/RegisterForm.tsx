@@ -9,7 +9,7 @@ import {
 } from '@mui/material';
 import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { UserRegisterData } from '../../models/user';
+import UserRegisterDto from '../../models/user.register.dto';
 import { registerUser } from '../../services/user.service';
 
 import './RegisterForm.css';
@@ -17,7 +17,7 @@ import './RegisterForm.css';
 function RegisterForm() {
   const navigate = useNavigate();
 
-  const [user, setUser] = useState<UserRegisterData>({
+  const [user, setUser] = useState<UserRegisterDto>({
     username: '',
     password: '',
     firstName: '',
@@ -31,7 +31,10 @@ function RegisterForm() {
     if (Object.values(user).some((value) => value === '')) return;
 
     registerUser(user)
-      .then((res) => navigate('/', { replace: true }))
+      .then((res) => {
+        //TODO isto obavesti preko snackbar
+        navigate('/', { replace: true });
+      })
       .catch((err) => console.log(err));
   };
 
@@ -64,6 +67,7 @@ function RegisterForm() {
             label="Ime"
             variant="standard"
             value={user.firstName}
+            required
             onChange={(event) =>
               setUser({ ...user, firstName: event.target.value })
             }
@@ -73,6 +77,7 @@ function RegisterForm() {
             label="Prezime"
             variant="standard"
             value={user.lastName}
+            required
             onChange={(event) =>
               setUser({ ...user, lastName: event.target.value })
             }
@@ -82,6 +87,7 @@ function RegisterForm() {
             label="Korisničko ime"
             variant="standard"
             value={user.username}
+            required
             onChange={(event) =>
               setUser({ ...user, username: event.target.value })
             }
@@ -90,7 +96,9 @@ function RegisterForm() {
             sx={{ marginBottom: 2 }}
             label="Lozinka"
             variant="standard"
+            type="password"
             value={user.password}
+            required
             onChange={(event) =>
               setUser({ ...user, password: event.target.value })
             }
