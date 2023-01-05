@@ -52,11 +52,6 @@ function LoginForm() {
         password,
       });
       setUser(user.data);
-      setSnackbar({
-        open: true,
-        message: 'Prijavljivanje je uspešno!',
-        severity: 'success',
-      });
       navigate('/home', { replace: true });
     } catch (err: any) {
       if (err.response) {
@@ -134,6 +129,12 @@ function LoginForm() {
                 type="password"
                 required
                 inputRef={passwordRef}
+                onKeyPress={(ev) => {
+                  if (ev.key === 'Enter') {
+                    onLoginClicked();
+                    ev.preventDefault();
+                  }
+                }}
               />
             </Box>
             <Button
