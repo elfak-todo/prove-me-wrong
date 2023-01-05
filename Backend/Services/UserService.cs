@@ -11,7 +11,7 @@ public interface IUserService
     Task<ServiceResult<User>> GetById(string id);
     Task<ServiceResult<bool>> Register(UserRegisterData regData);
     Task<ServiceResult<UserDetails>> Login(UserLoginCreds user);
-    int? ValidateToken(string token);
+    string? ValidateToken(string token);
 }
 
 public class UserService : IUserService
@@ -81,8 +81,7 @@ public class UserService : IUserService
 
         User authUser = res.Result;
 
-        //TODO - problem user id u neo je string.
-        _sessions.Insert(new Session { UserID = 10, AccessToken = AccessToken });
+        _sessions.Insert(new Session { UserID = authUser.ID, AccessToken = AccessToken });
         _provider.Connection.Execute("EXPIRE", "session:" + AccessToken, "3600");
 
         return new ServiceResult<UserDetails>
@@ -116,7 +115,7 @@ public class UserService : IUserService
         };
     }
 
-    public int? ValidateToken(string token)
+    public string? ValidateToken(string token)
     {
         Session? s = _sessions.FindById(token);
         if (s == null)

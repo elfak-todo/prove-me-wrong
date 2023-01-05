@@ -14,7 +14,7 @@ public class AuthorizeAttribute : Attribute, IAuthorizationFilter
             return;
         }
 
-        int? userID = (int?)context.HttpContext.Items["UserID"];
+        string? userID = (string?)context.HttpContext.Items["UserID"];
         if (userID != null)
         {
             return;

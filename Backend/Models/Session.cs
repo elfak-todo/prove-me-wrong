@@ -7,5 +7,5 @@ public class Session
 {
     [RedisIdField][Indexed] public string? AccessToken { get; set; }
 
-    [Indexed] public int? UserID { get; set; }
+    [Indexed] public string? UserID { get; set; }
 }
