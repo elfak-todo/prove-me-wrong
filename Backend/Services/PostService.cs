@@ -5,7 +5,7 @@ namespace Backend.Services;
 public interface IPostService
 {
     Task<List<PostFeedData>> GetFeed(string topicID);
-    Task<ServiceResult<Post>> Create(string authorID, string topicID, Post postData);
+    Task<ServiceResult<PostFeedData>> Create(string authorID, string topicID, Post postData);
     Task<ServiceResult<Post>> Delete(string id);
 }
 
@@ -32,7 +32,7 @@ public class PostService : IPostService
         return posts.ToList();
     }
 
-    public async Task<ServiceResult<Post>> Create(string authorID, string topicID, Post postData)
+    public async Task<ServiceResult<PostFeedData>> Create(string authorID, string topicID, Post postData)
     {
         postData.ID = Guid.NewGuid().ToString();
         postData.DatePublished = DateTime.Now;
@@ -42,12 +42,12 @@ public class PostService : IPostService
                                     .Return(topic => topic.As<Topic>()).ResultsAsync;
 
         if (topic.SingleOrDefault() == null)
-            return new ServiceResult<Post> { StatusCode = ServiceStatusCode.NotFound, ErrorMessage = "TopicNotFound" };
+            return new ServiceResult<PostFeedData> { StatusCode = ServiceStatusCode.NotFound, ErrorMessage = "TopicNotFound" };
 
         var author = await _userService.GetById(authorID);
 
         if (author.Result == null)
-            return new ServiceResult<Post> { StatusCode = ServiceStatusCode.NotFound, ErrorMessage = "UserInvalid" };
+            return new ServiceResult<PostFeedData> { StatusCode = ServiceStatusCode.NotFound, ErrorMessage = "UserInvalid" };
 
 
         var newPost = await _client.Cypher.Match("(topic:Topic), (user:User)")
@@ -58,9 +58,9 @@ public class PostService : IPostService
                                     .Create("(post)-[:POSTED_BY]->(user)")
                                     .Return(post => post.As<Post>()).ResultsAsync;
 
-        return new ServiceResult<Post>
+        return new ServiceResult<PostFeedData>
         {
-            Result = newPost.Single(),
+            Result = new PostFeedData { Author = author.Result, Post = newPost.Single() },
             StatusCode = ServiceStatusCode.Success
         };
     }
