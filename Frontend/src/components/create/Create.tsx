@@ -1,28 +1,28 @@
 import { Dialog, Fab } from '@mui/material';
 import AddIcon from '@mui/icons-material/Add';
 import { useLocation } from 'react-router';
-import { Dispatch, useState } from 'react';
+import { Dispatch, SetStateAction, useState } from 'react';
 
 import PostForm from '../postForm/PostForm';
 import TopicForm from '../topicForm/TopicForm';
-import { ITopic } from '../../models/topic';
+import TopicFeedData from '../../models/topic.feed.dto';
 
 interface CreateProps {
-  feed: ITopic[];
-  setFeed: Dispatch<React.SetStateAction<ITopic[]>>;
+  feed: TopicFeedData[];
+  setFeed: Dispatch<SetStateAction<TopicFeedData[]>>;
 }
 
 function Create({ feed, setFeed }: CreateProps) {
   const { pathname } = useLocation();
   const [isOpen, setIsOpen] = useState<boolean>(false);
 
-  return pathname === '/home' || pathname === '/topic' ? (
+  return (
     <>
       <Fab
         sx={{
           position: 'fixed',
-          top: 80,
-          left: 10,
+          bottom: 10,
+          right: 10,
         }}
         color="primary"
         onClick={() => setIsOpen(true)}
@@ -42,7 +42,7 @@ function Create({ feed, setFeed }: CreateProps) {
         ) : null}
       </Dialog>
     </>
-  ) : null;
+  );
 }
 
 export default Create;

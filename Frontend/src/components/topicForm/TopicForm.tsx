@@ -8,12 +8,13 @@ import {
 import { Stack } from '@mui/system';
 import { Dispatch, useState, MouseEvent } from 'react';
 import { ITopic } from '../../models/topic';
+import TopicFeedData from '../../models/topic.feed.dto';
 import { createTopic } from '../../services/topic.service';
 
 interface TopicFormProps {
   setIsOpen: Dispatch<React.SetStateAction<boolean>>;
-  feed: ITopic[];
-  setFeed: Dispatch<React.SetStateAction<ITopic[]>>;
+  feed: TopicFeedData[];
+  setFeed: Dispatch<React.SetStateAction<TopicFeedData[]>>;
 }
 
 function TopicForm({ setIsOpen, feed, setFeed }: TopicFormProps) {
@@ -29,9 +30,8 @@ function TopicForm({ setIsOpen, feed, setFeed }: TopicFormProps) {
 
     if (title === '' || description === '') return;
 
-    console.log(feed);
     createTopic(topic)
-      .then(({ data }) => setFeed([...feed, data]))
+      .then(({ data }) => setFeed([data, ...feed]))
       .catch(({ error }) => console.log(error));
 
     setIsOpen(false);

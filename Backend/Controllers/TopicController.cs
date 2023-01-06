@@ -22,8 +22,7 @@ public class TopicController : ControllerBase
         return Ok(await _topicService.GetAll());
     }
 
-    [Route("{id}")]
-    [HttpGet]
+    [HttpGet("{id}")]
     public async Task<ActionResult> Get(string id)
     {
         return Ok(await _topicService.Get(id));

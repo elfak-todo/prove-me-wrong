@@ -1,5 +1,5 @@
-import { Card, CardContent, CardHeader, Typography } from "@mui/material";
-import Friend from "../friend/Friend";
+import { Card, CardHeader, Typography } from "@mui/material";
+// import Friend from "../friend/Friend";
 import "./FriendList.css";
 
 function FriendList() {
@@ -13,12 +13,12 @@ function FriendList() {
         }
         subheader="Lista prijatelja"
       />
-      <CardContent>
+      {/* <CardContent>
               <Friend/>
       <Friend/>
       <Friend/>
       <Friend/>
-      </CardContent>
+      </CardContent> */}
 
     </Card>
   );
