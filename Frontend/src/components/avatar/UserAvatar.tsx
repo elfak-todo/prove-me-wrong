@@ -18,13 +18,14 @@ function stringToColor(string: string) {
   return color;
 }
 
-function stringAvatar(name: string) {
+function stringAvatar(name: string, size: number) {
   return {
     sx: {
       bgcolor: stringToColor(name),
-      width: 48,
-      height: 48,
-      mr: 1,
+      width: size,
+      height: size,
+      mr: 0.5,
+      fontSize: size / 2,
     },
     children: `${name.split(' ')[0][0]}${name.split(' ')[1][0]}`,
   };
@@ -32,10 +33,11 @@ function stringAvatar(name: string) {
 
 interface UserAvatarProps {
   name: string;
+  size: number;
 }
 
-function UserAvatar({ name }: UserAvatarProps) {
-  return <Avatar {...stringAvatar(name)} />;
+function UserAvatar({ name, size }: UserAvatarProps) {
+  return <Avatar {...stringAvatar(name, size)} />;
 }
 
 export default UserAvatar;

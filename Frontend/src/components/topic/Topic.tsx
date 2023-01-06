@@ -25,7 +25,7 @@ function Topic({ feedEl }: TopicProps) {
   const [isExpanded, setIsExpanded] = useState(false);
   const navigate = useNavigate();
 
-  const {topic, author} = feedEl;
+  const { topic, author } = feedEl;
 
   return (
     <Card
@@ -37,10 +37,15 @@ function Topic({ feedEl }: TopicProps) {
             <strong> {topic.title}</strong>
           </Typography>
         }
-        subheader={`Diskusija započeta: ${topic.datePublished && dateSrp(topic.datePublished)}`}
+        subheader={`Diskusija započeta: ${
+          topic.datePublished && dateSrp(topic.datePublished)
+        }`}
         action={
           <>
-            <Button variant="contained" onClick={() => navigate('/topic')}>
+            <Button
+              variant="contained"
+              onClick={() => navigate(`/topic/${topic.id}`)}
+            >
               Istraži
             </Button>
             <ExpandMore
@@ -65,7 +70,7 @@ function Topic({ feedEl }: TopicProps) {
           <Typography variant="body1" color="white">
             Temu započeo
           </Typography>
-          <Friend user={author}/>
+          <Friend user={author} />
         </div>
       </CardActions>
     </Card>

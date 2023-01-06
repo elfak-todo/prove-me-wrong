@@ -1,28 +1,30 @@
-import { CardActions, IconButton } from "@mui/material";
-import ExpandMore from "../../expandMore/ExpandMore";
-import FavoriteIcon from "@mui/icons-material/Favorite";
-import ModeCommentIcon from "@mui/icons-material/ModeComment";
-import ExpandMoreIcon from "@mui/icons-material/ExpandMore";
-import { useState } from "react";
+import { CardActions, IconButton } from '@mui/material';
+import ExpandMore from '../../expandMore/ExpandMore';
+import FavoriteIcon from '@mui/icons-material/Favorite';
+import ModeCommentIcon from '@mui/icons-material/ModeComment';
+import ExpandMoreIcon from '@mui/icons-material/ExpandMore';
+import { Dispatch, SetStateAction, useState } from 'react';
+import Post from '../../../models/post';
 
 interface PostFooterProps {
   isExpanded: boolean;
-  setIsExpanded: any;
+  setIsExpanded: Dispatch<SetStateAction<boolean>>;
+  post: Post;
 }
 
-function PostFooter({ isExpanded, setIsExpanded }: PostFooterProps) {
+function PostFooter({ isExpanded, setIsExpanded, post }: PostFooterProps) {
   const [isLiked, setIsLiked] = useState<boolean>(false);
 
   return (
     <CardActions disableSpacing>
       <>
         <IconButton
-          color={isLiked ? "primary" : "default"}
+          color={isLiked ? 'primary' : 'default'}
           onClick={() => setIsLiked(!isLiked)}
         >
           <FavoriteIcon />
         </IconButton>
-        123
+        {post.likeCount}
       </>
       <>
         <IconButton onClick={() => setIsExpanded(!isExpanded)}>

@@ -4,13 +4,17 @@ import {
   DialogContent,
   DialogTitle,
   TextField,
-} from "@mui/material";
+} from '@mui/material';
+import { Dispatch, SetStateAction } from 'react';
+import PostFeedData from '../../models/post.feed.dto';
 
 interface PostFormProps {
-  setIsOpen: any;
+  feed: PostFeedData[];
+  setFeed: Dispatch<SetStateAction<PostFeedData[]>>;
+  setIsOpen: Dispatch<SetStateAction<boolean>>;
 }
 
-function PostForm({ setIsOpen }: PostFormProps) {
+function PostForm({ feed, setFeed, setIsOpen }: PostFormProps) {
   return (
     <>
       <DialogTitle>Kreiranje objave</DialogTitle>

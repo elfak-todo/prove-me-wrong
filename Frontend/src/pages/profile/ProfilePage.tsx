@@ -1,8 +1,9 @@
 import { Stack } from "@mui/material";
 import { Container } from "@mui/system";
-import Feed from "../../components/feed/Feed";
 import FriendList from "../../components/friendList/FriendList";
 import Profile from "../../components/profile/Profile";
+// import PostFeed from "../../components/postFeed/PostFeed";
+
 import "./ProfilePage.css";
 
 function ProfilePage() {
@@ -12,7 +13,7 @@ function ProfilePage() {
         <Profile />
         <Stack direction="row" spacing={5}>
         <FriendList />
-          <Feed />
+          {/* <PostFeed /> */}
         </Stack>
       </Stack>
     </Container>

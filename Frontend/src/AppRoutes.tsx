@@ -14,7 +14,7 @@ function AppRoutes() {
     <Routes>
       <Route path="/home" element={<HomePage />} />
       <Route path="/profile" element={<ProfilePage />} />
-      <Route path="/topic" element={<TopicPage />} />
+      <Route path="/topic/:topicId" element={<TopicPage />} />
       <Route path="*" element={<Navigate replace to="/home" />} />
     </Routes>
   ) : (

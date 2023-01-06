@@ -1,27 +1,25 @@
-import { Avatar, CardHeader, Typography } from "@mui/material";
-import { useNavigate } from "react-router";
+import { CardHeader, Typography } from '@mui/material';
 
-import milanImg from "../../../images/milan.jpg";
-import Options from "../../options/Options";
+import Post from '../../../models/post';
+import User from '../../../models/user';
+import UserAvatar from '../../avatar/UserAvatar';
+import Options from '../../options/Options';
 
-function PostHeader() {
-  const navigate = useNavigate();
+interface PostHeaderProps {
+  post: Post;
+  author: User;
+}
+
+function PostHeader({ post, author }: PostHeaderProps) {
   return (
     <CardHeader
       avatar={
-        <Avatar
-          src={milanImg}
-          sx={{ width: 48, height: 48, cursor: "pointer" }}
-          onClick={() => navigate("/profile")}
-        />
+        <UserAvatar name={`${author.firstName} ${author.lastName}`} size={48} />
       }
       action={<Options />}
       title={
-        <Typography
-          sx={{ mb: 0 }}
-          variant="body1"
-        >
-          Milan Lukić
+        <Typography sx={{ mb: 0 }} variant="body1">
+          {`${author.firstName} ${author.lastName}`}
         </Typography>
       }
       subheader="25. Decembar 2022"

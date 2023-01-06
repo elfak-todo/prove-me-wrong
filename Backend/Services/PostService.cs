@@ -4,7 +4,7 @@ using Neo4jClient;
 namespace Backend.Services;
 public interface IPostService
 {
-    Task<List<Post>> GetFeed(string topicID);
+    Task<List<PostFeedData>> GetFeed(string topicID);
     Task<ServiceResult<Post>> Create(string authorID, string topicID, Post postData);
     Task<ServiceResult<Post>> Delete(string id);
 }
@@ -19,11 +19,15 @@ public class PostService : IPostService
         _userService = userService;
     }
 
-    public async Task<List<Post>> GetFeed(string topicID)
+    public async Task<List<PostFeedData>> GetFeed(string topicID)
     {
-        var posts = await _client.Cypher.Match("(post:Post)-[:RELATED_TO]->(topic:Topic)")
+        var posts = await _client.Cypher.Match("(post:Post)-[:RELATED_TO]->(topic:Topic), (post:Post)-[:POSTED_BY]->(user:User)")
                                     .Where((Topic topic) => topic.ID == topicID)
-                                    .Return(post => post.As<Post>()).ResultsAsync;
+                                    .Return((post, user) => new PostFeedData
+                                    {
+                                        Post = post.As<Post>(),
+                                        Author = user.As<User>()
+                                    }).ResultsAsync;
 
         return posts.ToList();
     }
