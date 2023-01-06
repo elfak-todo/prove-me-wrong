@@ -45,7 +45,16 @@ function TopicForm({ setIsOpen, feed, setFeed }: TopicFormProps) {
     if (!tags || tags.length === 0 || tags.length > 3) return;
 
     createTopic(topic)
-      .then(({ data }) => setFeed([data, ...feed]))
+      .then(({ data }) => {
+        setFeed([
+          {
+            topic: data.topic,
+            author: data.author,
+            tags: topic.tags!,
+          },
+          ...feed,
+        ]);
+      })
       .catch(({ error }) => console.log(error));
 
     setIsOpen(false);

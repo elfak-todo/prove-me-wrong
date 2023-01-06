@@ -20,15 +20,25 @@ public class TopicService : ITopicService
 
     public async Task<List<TopicFeedData>> GetAll()
     {
-        var topics = await _client.Cypher.Match("(topic: Topic)-[:CREATED_BY]->(user:User)")
-                                .Return((topic, user) => new TopicFeedData
-                                {
-                                    Topic = topic.As<Topic>(),
-                                    Author = user.As<User>()
-                                }).ResultsAsync;
+        var topics = await _client.Cypher
+                            .Match("(topic:Topic)-[:CREATED_BY]->(user:User)")
+                            .OptionalMatch("(topic)-[:TAGGED_BY]->(tag:Tag)")
+                            .Return((topic, user, tag) => new
+                            {
+                                Topic = topic.As<Topic>(),
+                                Author = user.As<User>(),
+                                Tag = tag.CollectAs<Tag>()
+                            })
+                            .ResultsAsync;
 
-        return topics.ToList();
+        return topics.Select(t => new TopicFeedData
+        {
+            Topic = t.Topic,
+            Author = t.Author,
+            Tags = t.Tag.ToList()
+        }).ToList();
     }
+
 
     public async Task<Topic?> Get(string id)
     {
@@ -65,7 +75,7 @@ public class TopicService : ITopicService
                                         Topic = topic.As<Topic>(),
                                         Author = user.As<User>()
                                     }).ResultsAsync;
-                                    
+
         foreach (Tag t in topicData.Tags!)
         {
             await _client.Cypher.Match("(topic:Topic), (tag:Tag)")
