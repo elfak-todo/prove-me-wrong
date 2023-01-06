@@ -65,6 +65,8 @@ app.UseHttpsRedirection();
 
 app.UseMiddleware<AuthMiddleware>();
 
+app.UseWebSockets();
+
 app.MapControllers();
 
 app.Run();
