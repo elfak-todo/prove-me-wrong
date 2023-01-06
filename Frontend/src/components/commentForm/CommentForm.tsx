@@ -1,15 +1,15 @@
-import {
-  Avatar,
-  Stack,
-  TextField,
-} from "@mui/material";
+import { Stack, TextField } from '@mui/material';
+import { useContext } from 'react';
 
-import milanImg from "../../images/milan.jpg";
+import UserAvatar from '../avatar/UserAvatar';
+import UserContext from '../userManager/UserManager';
 
 function CommentForm() {
+  const { user } = useContext(UserContext);
+
   return (
     <Stack direction="row" spacing={1}>
-      <Avatar src={milanImg} sx={{ width: 32, height: 32 }} />
+      <UserAvatar name={`${user?.firstName} ${user?.lastName}`} size={32} />
       <TextField
         size="small"
         fullWidth

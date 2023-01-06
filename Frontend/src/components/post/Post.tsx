@@ -1,23 +1,32 @@
-import { Card, CardContent, Typography } from "@mui/material";
-import { useState } from "react";
+import { Card, CardContent, Typography } from '@mui/material';
+import { Dispatch, SetStateAction, useState } from 'react';
+import PostFeedData from '../../models/post.feed.dto';
 
-import CommentSection from "../commentSection/CommentSection";
-import PostFooter from "./footer/PostFooter";
-import PostHeader from "./header/PostHeader";
+import CommentSection from '../commentSection/CommentSection';
+import PostFooter from './footer/PostFooter';
+import PostHeader from './header/PostHeader';
 
-function Post() {
-  const [isExpanded, setIsExpanded] = useState(false);
+interface PostProps {
+  feedEl: PostFeedData;
+  feed: PostFeedData[];
+  setFeed: Dispatch<SetStateAction<PostFeedData[]>>;
+}
+
+function Post({ feedEl, feed, setFeed }: PostProps) {
+  const [isExpanded, setIsExpanded] = useState<boolean>(false);
+  const { post, author } = feedEl;
 
   return (
-    <Card sx={{ maxWidth: 700, marginTop: 5 }}>
-      <PostHeader />
+    <Card sx={{ maxWidth: 700, minWidth: 600, marginTop: 5 }}>
+      <PostHeader post={post} author={author} feed={feed} setFeed={setFeed} />
       <CardContent>
-        <Typography variant="body2">
-          Programeryy će preživeti i web3 i chatGPT jer im se može. Ne učimo za
-          džabe fagzz. Ne gubite nadu, poz.
-        </Typography>
+        <Typography variant="body2">{post.text}</Typography>
       </CardContent>
-      <PostFooter isExpanded={isExpanded} setIsExpanded={setIsExpanded} />
+      <PostFooter
+        post={post}
+        isExpanded={isExpanded}
+        setIsExpanded={setIsExpanded}
+      />
       <CommentSection isExpanded={isExpanded} />
     </Card>
   );

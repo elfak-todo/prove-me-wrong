@@ -9,21 +9,23 @@ import {
 } from '@mui/material';
 import { useState } from 'react';
 import { useNavigate } from 'react-router';
-import { ITopic } from '../../models/topic';
 import ExpandMore from '../expandMore/ExpandMore';
 import ExpandMoreIcon from '@mui/icons-material/ExpandMore';
 import Friend from '../friend/Friend';
 
 import './Topic.css';
 import { dateSrp } from '../../dateParser';
+import TopicFeedData from '../../models/topic.feed.dto';
 
 interface TopicProps {
-  topic: ITopic;
+  feedEl: TopicFeedData;
 }
 
-function Topic({ topic }: TopicProps) {
+function Topic({ feedEl }: TopicProps) {
   const [isExpanded, setIsExpanded] = useState(false);
   const navigate = useNavigate();
+
+  const { topic, author } = feedEl;
 
   return (
     <Card
@@ -35,10 +37,15 @@ function Topic({ topic }: TopicProps) {
             <strong> {topic.title}</strong>
           </Typography>
         }
-        subheader={`Diskusija započeta: ${topic.datePublished && dateSrp(topic.datePublished)}`}
+        subheader={`Diskusija započeta: ${
+          topic.datePublished && dateSrp(topic.datePublished)
+        }`}
         action={
           <>
-            <Button variant="contained" onClick={() => navigate('/topic')}>
+            <Button
+              variant="contained"
+              onClick={() => navigate(`/topic/${topic.id}`)}
+            >
               Istraži
             </Button>
             <ExpandMore
@@ -63,7 +70,7 @@ function Topic({ topic }: TopicProps) {
           <Typography variant="body1" color="white">
             Temu započeo
           </Typography>
-          <Friend />
+          <Friend user={author} />
         </div>
       </CardActions>
     </Card>
