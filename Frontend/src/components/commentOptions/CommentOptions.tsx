@@ -1,8 +1,8 @@
-import { IconButton, Menu, MenuItem } from "@mui/material";
-import MoreVertIcon from "@mui/icons-material/MoreVert";
-import { useState } from "react";
+import { IconButton, Menu, MenuItem } from '@mui/material';
+import MoreVertIcon from '@mui/icons-material/MoreVert';
+import { useState } from 'react';
 
-function Options() {
+function CommentOptions() {
   const [anchorEl, setAnchorEl] = useState<null | HTMLElement>(null);
 
   const handleClick = (event: React.MouseEvent<HTMLButtonElement>) => {
@@ -14,10 +14,10 @@ function Options() {
 
   return (
     <>
-    <IconButton sx={{padding: 0}} onClick={handleClick} >
-      <MoreVertIcon />
-    </IconButton>
-    <Menu
+      <IconButton sx={{ padding: 0 }} onClick={handleClick}>
+        <MoreVertIcon />
+      </IconButton>
+      <Menu
         id="basic-menu"
         anchorEl={anchorEl}
         open={Boolean(anchorEl)}
@@ -27,10 +27,12 @@ function Options() {
         }}
       >
         <MenuItem onClick={handleClose}>Izmeni</MenuItem>
-        <MenuItem onClick={handleClose} sx={{color: "red"}}>Obriši</MenuItem>
+        <MenuItem onClick={handleClose} sx={{ color: 'red' }}>
+          Obriši
+        </MenuItem>
       </Menu>
     </>
   );
 }
 
-export default Options;
+export default CommentOptions;

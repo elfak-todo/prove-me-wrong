@@ -1,4 +1,3 @@
-import { Typography } from '@mui/material';
 import { useEffect, useState } from 'react';
 import { useParams } from 'react-router';
 import Create from '../../components/create/Create';
@@ -24,9 +23,6 @@ function TopicPage() {
   return (
     <>
       <div className="feed-div">
-        <Typography variant="h6" color="primary.dark">
-          <strong> ChatGPT genocid nad programerima? </strong>
-        </Typography>
         <PostFeed feed={feed} setFeed={setFeed} />
       </div>
       <Create Form={PostForm} feed={feed} setFeed={setFeed} />

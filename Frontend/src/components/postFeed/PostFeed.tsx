@@ -13,7 +13,7 @@ function PostFeed({ feed, setFeed }: PostFeedProps) {
   return (
     <div className="feed-div-comp">
       {feed.map((el) => (
-        <Post key={el.post.id} feedEl={el}/>
+        <Post key={el.post.id} feedEl={el} feed={feed} setFeed={setFeed} />
       ))}
     </div>
   );

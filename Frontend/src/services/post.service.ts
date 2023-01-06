@@ -9,3 +9,7 @@ export const getPosts = (topicId: string) => {
 export const createPost = (data: Post, topicId: string) => {
   return axios.post(`${baseURL}/Post/${topicId}`, data);
 };
+
+export const deletePost = (postId: string) => {
+  return axios.delete(`${baseURL}/Post/${postId}`);
+};

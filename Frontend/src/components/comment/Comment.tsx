@@ -1,6 +1,6 @@
 import { Avatar, Card, CardContent, Typography } from "@mui/material";
 import lukaImg from "../../images/luka.jpg";
-import Options from "../options/Options";
+import CommentOptions from "../commentOptions/CommentOptions";
 import "./Comment.css";
 
 function Comment() {
@@ -15,7 +15,7 @@ function Comment() {
           </CardContent>
         </Card>
       </div>
-      <Options />
+      <CommentOptions />
     </div>
   );
 }
