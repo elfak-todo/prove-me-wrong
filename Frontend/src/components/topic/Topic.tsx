@@ -4,6 +4,7 @@ import {
   CardActions,
   CardContent,
   CardHeader,
+  Chip,
   Collapse,
   Typography,
 } from '@mui/material';
@@ -25,7 +26,7 @@ function Topic({ feedEl }: TopicProps) {
   const [isExpanded, setIsExpanded] = useState(false);
   const navigate = useNavigate();
 
-  const { topic, author } = feedEl;
+  const { topic, tags, author } = feedEl;
 
   return (
     <Card
@@ -33,17 +34,35 @@ function Topic({ feedEl }: TopicProps) {
     >
       <CardHeader
         title={
-          <Typography variant="h6" color="white">
-            <strong> {topic.title}</strong>
+          <>
+            <Typography variant="h6" color="white">
+              <strong> {topic.title}</strong>
+            </Typography>
+            {tags?.map((el) => {
+              return (
+                <Chip
+                  key={el.id}
+                  label={el.name}
+                  sx={{ marginRight: 1 }}
+                  size="small"
+                  color='primary'
+                />
+              );
+            })}
+          </>
+        }
+        subheader={
+          <Typography variant="caption">
+            {`Diskusija započeta: ${
+              topic.datePublished && dateSrp(topic.datePublished)
+            }`}
           </Typography>
         }
-        subheader={`Diskusija započeta: ${
-          topic.datePublished && dateSrp(topic.datePublished)
-        }`}
         action={
           <>
             <Button
               variant="contained"
+              size='small'
               onClick={() => navigate(`/topic/${topic.id}`)}
             >
               Istraži

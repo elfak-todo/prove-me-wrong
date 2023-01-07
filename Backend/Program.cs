@@ -24,6 +24,8 @@ var client = new BoltGraphClient(builder.Configuration["Neo4j:ConnectionString"]
 client.ConnectAsync();
 builder.Services.AddSingleton<IGraphClient>(client);
 
+builder.Services.AddSignalR();
+
 //Services
 builder.Services.AddScoped<IUserService, UserService>();
 builder.Services.AddScoped<IPasswordManager, PasswordManager>();
@@ -50,7 +52,8 @@ builder.Services.AddCors(options =>
                                               "http://192.168.1.35:3000",
                                               "http://192.168.100.2:3000")
                                               .AllowAnyHeader()
-                                              .AllowAnyMethod();
+                                              .AllowAnyMethod()
+                                              .AllowCredentials();
                       });
 
 });
@@ -72,7 +75,16 @@ app.UseHttpsRedirection();
 
 app.UseMiddleware<AuthMiddleware>();
 
-app.UseWebSockets();
+var webSocketOptions = new WebSocketOptions
+{
+    KeepAliveInterval = TimeSpan.FromMinutes(2)
+};
+
+webSocketOptions.AllowedOrigins.Add("http://localhost:3000");
+
+app.UseWebSockets(webSocketOptions);
+app.UseDefaultFiles();
+app.UseStaticFiles();
 
 app.MapControllers();
 

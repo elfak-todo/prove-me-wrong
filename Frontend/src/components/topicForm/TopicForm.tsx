@@ -1,4 +1,5 @@
 import {
+  Autocomplete,
   Button,
   DialogActions,
   DialogContent,
@@ -6,9 +7,11 @@ import {
   TextField,
 } from '@mui/material';
 import { Stack } from '@mui/system';
-import { Dispatch, useState, MouseEvent } from 'react';
+import { Dispatch, useState, MouseEvent, useEffect } from 'react';
+import Tag from '../../models/tag';
 import { ITopic } from '../../models/topic';
 import TopicFeedData from '../../models/topic.feed.dto';
+import { getTags } from '../../services/tag.service';
 import { createTopic } from '../../services/topic.service';
 
 interface TopicFormProps {
@@ -18,20 +21,40 @@ interface TopicFormProps {
 }
 
 function TopicForm({ setIsOpen, feed, setFeed }: TopicFormProps) {
+  const [tags, setTags] = useState<Tag[]>([]);
+
   const [topic, setTopic] = useState<ITopic>({
     title: '',
     description: '',
+    tags: [],
   });
+
+  useEffect(() => {
+    getTags()
+      .then(({ data }) => setTags(data))
+      .catch(({ error }) => console.log(error));
+  }, []);
 
   const handlePost = (event: MouseEvent<HTMLButtonElement>) => {
     event.stopPropagation();
 
-    const { title, description } = topic;
+    const { title, description, tags } = topic;
 
     if (title === '' || description === '') return;
 
+    if (!tags || tags.length === 0 || tags.length > 3) return;
+
     createTopic(topic)
-      .then(({ data }) => setFeed([data, ...feed]))
+      .then(({ data }) => {
+        setFeed([
+          {
+            topic: data.topic,
+            author: data.author,
+            tags: topic.tags!,
+          },
+          ...feed,
+        ]);
+      })
       .catch(({ error }) => console.log(error));
 
     setIsOpen(false);
@@ -41,7 +64,22 @@ function TopicForm({ setIsOpen, feed, setFeed }: TopicFormProps) {
     <>
       <DialogTitle>Kreiranje teme za diskusiju</DialogTitle>
       <DialogContent>
-        <Stack direction="column" spacing={2}>
+        <Stack direction="column" spacing={2} mt={2}>
+          <Autocomplete
+            size="small"
+            multiple
+            options={tags}
+            getOptionLabel={(option) => option.name}
+            filterSelectedOptions
+            renderInput={(params) => (
+              <TextField
+                {...params}
+                label="Izaberite tagove"
+                placeholder="Programiranje, Sport, Politika..."
+              />
+            )}
+            onChange={(event, value) => setTopic({ ...topic, tags: value })}
+          />
           <TextField
             autoFocus
             margin="dense"

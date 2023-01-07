@@ -20,15 +20,25 @@ public class TopicService : ITopicService
 
     public async Task<List<TopicFeedData>> GetAll()
     {
-        var topics = await _client.Cypher.Match("(topic: Topic)-[:CREATED_BY]->(user:User)")
-                                .Return((topic, user) => new TopicFeedData
-                                {
-                                    Topic = topic.As<Topic>(),
-                                    Author = user.As<User>()
-                                }).ResultsAsync;
+        var topics = await _client.Cypher
+                            .Match("(topic:Topic)-[:CREATED_BY]->(user:User)")
+                            .OptionalMatch("(topic)-[:TAGGED_BY]->(tag:Tag)")
+                            .Return((topic, user, tag) => new
+                            {
+                                Topic = topic.As<Topic>(),
+                                Author = user.As<User>(),
+                                Tag = tag.CollectAs<Tag>()
+                            })
+                            .ResultsAsync;
 
-        return topics.ToList();
+        return topics.Select(t => new TopicFeedData
+        {
+            Topic = t.Topic,
+            Author = t.Author,
+            Tags = t.Tag.ToList()
+        }).ToList();
     }
+
 
     public async Task<Topic?> Get(string id)
     {
@@ -53,13 +63,27 @@ public class TopicService : ITopicService
         var newTopic = await _client.Cypher.Match("(user:User)")
                                     .Where((User user) => user.ID == authorID)
                                     .Create("(topic:Topic $topicData)-[:CREATED_BY]->(user)")
-                                    .WithParam("topicData", topicData)
+                                    .WithParam("topicData", new
+                                    {
+                                        ID = topicData.ID,
+                                        Title = topicData.Title,
+                                        Description = topicData.Description,
+                                        DatePublished = topicData.DatePublished,
+                                    })
                                     .Return((topic, user) => new TopicFeedData
                                     {
                                         Topic = topic.As<Topic>(),
                                         Author = user.As<User>()
                                     }).ResultsAsync;
 
+        foreach (Tag t in topicData.Tags!)
+        {
+            await _client.Cypher.Match("(topic:Topic), (tag:Tag)")
+                                    .Where((Topic topic) => topic.ID == topicData.ID)
+                                    .AndWhere((Tag tag) => tag.ID == t.ID)
+                                    .Create("(topic)-[:TAGGED_BY]->(tag)")
+                                    .ExecuteWithoutResultsAsync();
+        }
 
         return new ServiceResult<TopicFeedData> { Result = newTopic.Single(), StatusCode = ServiceStatusCode.Success };
     }

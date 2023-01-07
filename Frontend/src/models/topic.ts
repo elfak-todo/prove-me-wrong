@@ -1,3 +1,4 @@
+import Tag from "./tag";
 import User from "./user";
 
 export interface ITopic {
@@ -6,4 +7,5 @@ export interface ITopic {
     description: string;
     datePublished?: Date;
     author?: User;
+    tags?: Tag[]
 }
