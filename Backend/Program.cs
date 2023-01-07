@@ -1,12 +1,19 @@
 using Backend.Services;
+using Backend.Hubs;
 using Redis.OM;
 using Neo4jClient;
+using Microsoft.AspNetCore.ResponseCompression;
 
 var builder = WebApplication.CreateBuilder(args);
 
 builder.Services.AddControllers();
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
+builder.Services.AddResponseCompression(opts => 
+{
+    opts.MimeTypes = ResponseCompressionDefaults.MimeTypes.Concat(
+        new[] {"application/octet-stream"});
+});
 
 builder.Services.AddSingleton(new RedisConnectionProvider(builder.Configuration["Redis:ConnectionString"]!));
 
@@ -68,5 +75,7 @@ app.UseMiddleware<AuthMiddleware>();
 app.UseWebSockets();
 
 app.MapControllers();
+
+app.MapHub<ChatHub>("/chathub");
 
 app.Run();

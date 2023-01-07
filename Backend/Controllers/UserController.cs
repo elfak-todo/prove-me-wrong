@@ -52,4 +52,5 @@ public class UserController : ControllerBase
 
         return Ok(res.Result);
     }
+
 }
