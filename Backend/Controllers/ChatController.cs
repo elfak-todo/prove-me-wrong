@@ -11,6 +11,7 @@ namespace Backend.Controllers;
 public class ChatController : ControllerBase
 {
     [Route("/ws")]
+    [AllowAnonymous]
     [ApiExplorerSettings(IgnoreApi = true)]
     public async Task Get()
     {
