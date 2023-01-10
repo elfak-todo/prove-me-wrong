@@ -32,7 +32,31 @@ public class UserController : ControllerBase
     [HttpGet]
     public async Task<IActionResult> GetProfile(string id)
     {
-        return Ok(await _userService.GetProfile(id));
+        return Ok(await _userService.GetProfile((string?)HttpContext.Items["UserID"]!, id));
+    }
+
+    [Route("friendRequest/{friendId}")]
+    [HttpPost]
+    public async Task<IActionResult> AddFriend(string friendId)
+    {
+        var res = await _userService.AddFriend((string?)HttpContext.Items["UserID"]!, friendId);
+
+        if (res.StatusCode != ServiceStatusCode.Success)
+            return BadRequest(res.ErrorMessage);
+
+        return Ok();
+    }
+
+    [Route("acceptFriendRequest/{friendId}")]
+    [HttpPatch]
+    public async Task<IActionResult> AcceptFriend(string friendId)
+    {
+        var res = await _userService.AcceptFriend((string?)HttpContext.Items["UserID"]!, friendId);
+
+        if (res.StatusCode != ServiceStatusCode.Success)
+            return BadRequest(res.ErrorMessage);
+
+        return Ok();
     }
 
     [AllowAnonymous]

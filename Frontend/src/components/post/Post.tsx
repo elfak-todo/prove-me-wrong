@@ -17,7 +17,7 @@ function Post({ feedEl, feed, setFeed }: PostProps) {
   const { post, author } = feedEl;
 
   return (
-    <Card sx={{ maxWidth: 700, minWidth: 600, marginTop: 5 }}>
+    <Card sx={{ maxWidth: 800, minWidth: 700, marginTop: 5 }}>
       <PostHeader post={post} author={author} feed={feed} setFeed={setFeed} />
       <CardContent>
         <Typography variant="body2">{post.text}</Typography>

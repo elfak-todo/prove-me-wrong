@@ -14,4 +14,12 @@ export const login = (data: UserLoginDto) => {
 
 export const getProfileData = (id: string) => {
   return axios.get<UserProfileData>(`/User/profile/${id}`);
-}
+};
+
+export const sendFriendRequest = (friendId: string) => {
+  return axios.post(`/User/friendRequest/${friendId}`);
+};
+
+export const acceptFriendRequest = (friendId: string) => {
+  return axios.patch(`/User/acceptFriendRequest/${friendId}`);
+};

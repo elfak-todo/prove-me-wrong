@@ -23,7 +23,7 @@ function PostHeader({ post, author, feed, setFeed }: PostHeaderProps) {
     <CardHeader
       avatar={
         <UserAvatar
-          id={user?.id}
+          id={author?.id}
           name={`${author.firstName} ${author.lastName}`}
           size={48}
         />

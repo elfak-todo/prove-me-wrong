@@ -1,10 +1,15 @@
-import { Card, CardHeader, Typography } from "@mui/material";
-// import Friend from "../friend/Friend";
-import "./FriendList.css";
+import { Card, CardContent, CardHeader, Typography } from '@mui/material';
+import User from '../../models/user';
+import Friend from '../friend/Friend';
+import './FriendList.css';
 
-function FriendList() {
+interface FriendListProps {
+  friendList: User[];
+}
+
+function FriendList({ friendList }: FriendListProps) {
   return (
-    <Card elevation={2} sx={{width: 350, mt: 5}} className="fr-card">
+    <Card elevation={2} sx={{ width: 350, mt: 5 }} className="fr-card">
       <CardHeader
         title={
           <Typography mb={0} variant="body1">
@@ -13,13 +18,11 @@ function FriendList() {
         }
         subheader="Lista prijatelja"
       />
-      {/* <CardContent>
-              <Friend/>
-      <Friend/>
-      <Friend/>
-      <Friend/>
-      </CardContent> */}
-
+      <CardContent>
+        {friendList?.map((el) => {
+          return <Friend key={el.id} friend={el} />;
+        })}
+      </CardContent>
     </Card>
   );
 }

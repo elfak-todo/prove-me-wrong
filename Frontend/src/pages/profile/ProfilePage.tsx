@@ -16,6 +16,10 @@ function ProfilePage() {
     user: null,
     topicCount: 0,
     postCount: 0,
+    friends: false,
+    sentRequest: false,
+    receivedRequest: false,
+    friendList: [],
   });
 
   useEffect(() => {
@@ -25,13 +29,13 @@ function ProfilePage() {
       .then(({ data }) => setProfileData(data))
       .catch(({ error }) => console.log(error));
   }, [userId]);
-  
+
   return (
     <Container>
       <Stack direction="column" spacing={2} mt={2}>
-        <Profile profileData={profileData} />
+        <Profile profileData={profileData} setProfileData={setProfileData} />
         <Stack direction="row" spacing={5}>
-          <FriendList />
+          <FriendList friendList={profileData.friendList} />
           <ProfileFeed userId={userId} />
         </Stack>
       </Stack>
