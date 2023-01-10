@@ -30,7 +30,7 @@ function Topic({ feedEl }: TopicProps) {
 
   return (
     <Card
-      sx={{ maxWidth: 800, minWidth: 600, mt: 3, bgcolor: 'primary.light' }}
+      sx={{ maxWidth: 800, minWidth: 600, mt: 5, bgcolor: 'primary.light' }}
     >
       <CardHeader
         title={
@@ -41,8 +41,8 @@ function Topic({ feedEl }: TopicProps) {
             {tags?.map((el) => {
               return (
                 <Chip
-                  key={el.id}
-                  label={el.name}
+                  key={el?.id}
+                  label={el?.name}
                   sx={{ marginRight: 1 }}
                   size="small"
                   color='primary'
@@ -52,7 +52,7 @@ function Topic({ feedEl }: TopicProps) {
           </>
         }
         subheader={
-          <Typography variant="caption">
+          <Typography variant="caption" color="text.secondary">
             {`Diskusija započeta: ${
               topic.datePublished && dateSrp(topic.datePublished)
             }`}

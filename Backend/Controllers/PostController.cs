@@ -16,18 +16,25 @@ public class PostController : ControllerBase
         _postService = postService;
     }
 
-    [Route("{topicID}")]
+    [Route("{topicId}")]
     [HttpGet]
-    public async Task<ActionResult> GetFeed(string topicID)
+    public async Task<IActionResult> GetFeed(string topicId)
     {
-        return Ok(await _postService.GetFeed(topicID));
+        return Ok(await _postService.GetFeed(topicId));
     }
 
-    [Route("{topicID}")]
-    [HttpPost]
-    public async Task<ActionResult> Create([FromBody] Post post, string topicID)
+    [Route("profileFeed/{userId}")]
+    [HttpGet]
+    public async Task<IActionResult> GetUserFeed(string userId)
     {
-        var res = await _postService.Create((string?)HttpContext.Items["UserID"]!, topicID, post);
+        return Ok(await _postService.GetUserFeed(userId));
+    }
+
+    [Route("{topicId}")]
+    [HttpPost]
+    public async Task<IActionResult> Create([FromBody] Post post, string topicId)
+    {
+        var res = await _postService.Create((string?)HttpContext.Items["UserID"]!, topicId, post);
 
         if (res.StatusCode != ServiceStatusCode.Success)
             return BadRequest(res.ErrorMessage);
@@ -37,7 +44,7 @@ public class PostController : ControllerBase
 
     [Route("{id}")]
     [HttpDelete]
-    public async Task<ActionResult> Delete(string id)
+    public async Task<IActionResult> Delete(string id)
     {
         var res = await _postService.Delete(id);
 

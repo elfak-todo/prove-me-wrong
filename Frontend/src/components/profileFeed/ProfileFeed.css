@@ -1,0 +1,4 @@
+.profile-feed-div {
+    display: flex;
+    flex-direction: column;
+}

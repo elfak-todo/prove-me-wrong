@@ -13,7 +13,7 @@ function AppRoutes() {
   return user ? (
     <Routes>
       <Route path="/home" element={<HomePage />} />
-      <Route path="/profile" element={<ProfilePage />} />
+      <Route path="/profile/:userId" element={<ProfilePage />} />
       <Route path="/topic/:topicId" element={<TopicPage />} />
       <Route path="*" element={<Navigate replace to="/home" />} />
     </Routes>

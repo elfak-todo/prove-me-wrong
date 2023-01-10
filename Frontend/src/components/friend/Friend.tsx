@@ -25,7 +25,7 @@ function Friend({ user }: FriendProps) {
             alignItems: 'center',
           }}
         >
-          <UserAvatar name={`${user.firstName} ${user.lastName}`} size={32}/>
+          <UserAvatar id={user.id} name={`${user.firstName} ${user.lastName}`} size={32}/>
           <Typography mb={0} variant="body1">
             {`${user.firstName} ${user.lastName}`}
           </Typography>

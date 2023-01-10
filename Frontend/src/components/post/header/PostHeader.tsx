@@ -22,10 +22,16 @@ function PostHeader({ post, author, feed, setFeed }: PostHeaderProps) {
   return (
     <CardHeader
       avatar={
-        <UserAvatar name={`${author.firstName} ${author.lastName}`} size={48} />
+        <UserAvatar
+          id={user?.id}
+          name={`${author.firstName} ${author.lastName}`}
+          size={48}
+        />
       }
       action={
-        user?.id === author.id && <PostOptions post={post} feed={feed} setFeed={setFeed} />
+        user?.id === author.id && (
+          <PostOptions post={post} feed={feed} setFeed={setFeed} />
+        )
       }
       title={
         <Typography sx={{ mb: 0 }} variant="body1">

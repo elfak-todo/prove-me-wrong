@@ -5,8 +5,9 @@ namespace Backend.Services;
 public interface ITopicService
 {
     Task<List<TopicFeedData>> GetAll();
+    Task<List<TopicFeedData>> GetByUser(string userId);
     Task<Topic?> Get(string id);
-    Task<ServiceResult<TopicFeedData>> Create(string authorID, Topic topicData);
+    Task<ServiceResult<TopicFeedData>> Create(string authorId, Topic topicData);
 }
 public class TopicService : ITopicService
 {
@@ -39,6 +40,26 @@ public class TopicService : ITopicService
         }).ToList();
     }
 
+    public async Task<List<TopicFeedData>> GetByUser(string userId)
+    {
+        var topics = await _client.Cypher.Match("(topic:Topic)-[:CREATED_BY]->(user:User)")
+                                .Where((User user) => user.ID == userId)
+                                .OptionalMatch("(topic)-[:TAGGED_BY]->(tag:Tag)")
+                                .Return((topic, user, tag) => new
+                                {
+                                    Topic = topic.As<Topic>(),
+                                    Author = user.As<User>(),
+                                    Tag = tag.CollectAs<Tag>()
+                                }).ResultsAsync;
+
+        return topics.Select(t => new TopicFeedData
+        {
+            Topic = t.Topic,
+            Author = t.Author,
+            Tags = t.Tag.ToList()
+        }).ToList();
+    }
+
 
     public async Task<Topic?> Get(string id)
     {
@@ -49,9 +70,9 @@ public class TopicService : ITopicService
         return topic.SingleOrDefault();
     }
 
-    public async Task<ServiceResult<TopicFeedData>> Create(string authorID, Topic topicData)
+    public async Task<ServiceResult<TopicFeedData>> Create(string authorId, Topic topicData)
     {
-        var author = await _userService.GetById(authorID);
+        var author = await _userService.GetById(authorId);
 
         if (author.Result == null)
             return new ServiceResult<TopicFeedData> { StatusCode = ServiceStatusCode.NotFound, ErrorMessage = "InvalidUser" };
@@ -61,7 +82,7 @@ public class TopicService : ITopicService
         topicData.DatePublished = DateTime.Now;
 
         var newTopic = await _client.Cypher.Match("(user:User)")
-                                    .Where((User user) => user.ID == authorID)
+                                    .Where((User user) => user.ID == authorId)
                                     .Create("(topic:Topic $topicData)-[:CREATED_BY]->(user)")
                                     .WithParam("topicData", new
                                     {

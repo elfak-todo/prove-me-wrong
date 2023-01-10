@@ -5,6 +5,7 @@ namespace Backend.Services;
 public interface IPostService
 {
     Task<List<PostFeedData>> GetFeed(string topicID);
+    Task<List<PostFeedData>> GetUserFeed(string userId);
     Task<ServiceResult<PostFeedData>> Create(string authorID, string topicID, Post postData);
     Task<ServiceResult<Post>> Delete(string id);
 }
@@ -29,6 +30,17 @@ public class PostService : IPostService
                                         Author = user.As<User>()
                                     }).ResultsAsync;
 
+        return posts.ToList();
+    }
+
+    public async Task<List<PostFeedData>> GetUserFeed(string userId)
+    {
+        var posts = await _client.Cypher.Match("(post:Post)-[:POSTED_BY]->(user:User)")
+                                    .Where((User user) => user.ID == userId)
+                                    .Return((post, user) => new PostFeedData {
+                                        Post = post.As<Post>(),
+                                        Author = user.As<User>()
+                                    }).ResultsAsync;
         return posts.ToList();
     }
 

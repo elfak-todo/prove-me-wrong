@@ -1,23 +1,20 @@
-import { useEffect, useState } from 'react';
+import { Dispatch, SetStateAction } from 'react';
 import TopicFeedData from '../../models/topic.feed.dto';
-import { getTopics } from '../../services/topic.service';
 import Create from '../create/Create';
 import Topic from '../topic/Topic';
 import TopicForm from '../topicForm/TopicForm';
 
 import './TopicFeed.css';
 
-function TopicFeed() {
-  const [feed, setFeed] = useState<TopicFeedData[]>([]);
-
-  useEffect(() => {
-    getTopics().then(({ data }) => setFeed(data));
-  }, []);
-
+interface TopicFeedProps {
+  feed: TopicFeedData[];
+  setFeed: Dispatch<SetStateAction<TopicFeedData[]>>;
+}
+function TopicFeed({ feed, setFeed }: TopicFeedProps) {
   return (
     <>
       <div className="topics-div">
-        {feed.map((el) => (
+        {feed?.map((el) => (
           <Topic key={el.topic.id} feedEl={el} />
         ))}
       </div>

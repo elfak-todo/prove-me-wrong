@@ -17,19 +17,26 @@ public class TopicController : ControllerBase
     }
 
     [HttpGet]
-    public async Task<ActionResult> GetAll()
+    public async Task<IActionResult> GetAll()
     {
         return Ok(await _topicService.GetAll());
     }
 
+    [Route("userTopics/{userId}")]
+    [HttpGet]
+    public async Task<IActionResult> GetByUser(string userId)
+    {
+        return Ok(await _topicService.GetByUser(userId));
+    }
+
     [HttpGet("{id}")]
-    public async Task<ActionResult> Get(string id)
+    public async Task<IActionResult> Get(string id)
     {
         return Ok(await _topicService.Get(id));
     }
 
     [HttpPost]
-    public async Task<ActionResult> Create([FromBody] Topic topic)
+    public async Task<IActionResult> Create([FromBody] Topic topic)
     {
         var res = await _topicService.Create((string?)HttpContext.Items["UserID"]!, topic);
 

@@ -1,4 +1,5 @@
 import Avatar from '@mui/material/Avatar';
+import { useNavigate } from 'react-router';
 
 function stringToColor(string: string) {
   let hash = 0;
@@ -18,7 +19,7 @@ function stringToColor(string: string) {
   return color;
 }
 
-function stringAvatar(name: string, size: number) {
+export function stringAvatar(name: string, size: number) {
   return {
     sx: {
       bgcolor: stringToColor(name),
@@ -26,18 +27,27 @@ function stringAvatar(name: string, size: number) {
       height: size,
       mr: 0.5,
       fontSize: size / 2,
+      cursor: 'pointer',
     },
     children: `${name.split(' ')[0][0]}${name.split(' ')[1][0]}`,
   };
 }
 
 interface UserAvatarProps {
+  id?: string;
   name: string;
   size: number;
 }
 
-function UserAvatar({ name, size }: UserAvatarProps) {
-  return <Avatar {...stringAvatar(name, size)} />;
+function UserAvatar({ id, name, size }: UserAvatarProps) {
+  const navigate = useNavigate();
+
+  return (
+    <Avatar
+      {...stringAvatar(name, size)}
+      onClick={() => id && navigate(`/profile/${id}`)}
+    />
+  );
 }
 
 export default UserAvatar;

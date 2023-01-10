@@ -9,6 +9,7 @@ namespace Backend.Services;
 public interface IUserService
 {
     Task<ServiceResult<User>> GetById(string id);
+    Task<UserProfileData> GetProfile(string id);
     Task<ServiceResult<bool>> Register(UserRegisterData regData);
     Task<ServiceResult<UserDetails>> Login(UserLoginCreds user);
     string? ValidateToken(string token);
@@ -51,6 +52,24 @@ public class UserService : IUserService
             Result = user,
             StatusCode = ServiceStatusCode.Success
         };
+    }
+
+    public async Task<UserProfileData> GetProfile(string id)
+    {
+        var query = await _client.Cypher
+                                    .OptionalMatch("(t:Topic)-[:CREATED_BY]-(user:User)")
+                                    .Where((User user) => user.ID == id)
+                                    .With("user, COUNT(t) AS topicCount")
+                                    .OptionalMatch("(p:Post)-[:POSTED_BY]-(user)")
+                                    .With("user, topicCount, COUNT(p) AS postCount")
+                                    .Return((user, topicCount, postCount) => new UserProfileData
+                                    {
+                                        User = user.As<User>(),
+                                        TopicCount = topicCount.As<int>(),
+                                        PostCount = postCount.As<int>()
+                                    }).ResultsAsync;
+
+        return query.Single();
     }
 
     public async Task<ServiceResult<bool>> Register(UserRegisterData regData)

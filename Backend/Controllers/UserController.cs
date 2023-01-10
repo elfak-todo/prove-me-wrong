@@ -28,6 +28,13 @@ public class UserController : ControllerBase
         return Ok(res.Result);
     }
 
+    [Route("profile/{id}")]
+    [HttpGet]
+    public async Task<IActionResult> GetProfile(string id)
+    {
+        return Ok(await _userService.GetProfile(id));
+    }
+
     [AllowAnonymous]
     [Route("register")]
     [HttpPost]

@@ -15,11 +15,11 @@ import { useContext } from 'react';
 
 function Navbar() {
   const navigate = useNavigate();
-  const location = useLocation();
+  const { pathname } = useLocation();
 
-  const { setUser } = useContext(UserContext);
+  const { user, setUser } = useContext(UserContext);
 
-  return location.pathname !== '/' && location.pathname !== '/register' ? (
+  return pathname !== '/' && pathname !== '/register' ? (
     <Paper
       sx={{ position: 'fixed', bottom: 10, left: 0, right: 0 }}
       className="navbar-main"
@@ -37,7 +37,7 @@ function Navbar() {
             sx={{ color: 'white' }}
             label="Profil"
             icon={<AccountBoxIcon />}
-            onClick={() => navigate('/profile')}
+            onClick={() => navigate(`/profile/${user?.id}`)}
           />
           <BottomNavigationAction
             sx={{ color: 'white' }}
