@@ -1,30 +1,24 @@
 using Backend.Services;
-using Backend.Hubs;
-using Redis.OM;
+using StackExchange.Redis;
 using Neo4jClient;
-using Microsoft.AspNetCore.ResponseCompression;
 
 var builder = WebApplication.CreateBuilder(args);
 
 builder.Services.AddControllers();
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
-builder.Services.AddResponseCompression(opts => 
-{
-    opts.MimeTypes = ResponseCompressionDefaults.MimeTypes.Concat(
-        new[] {"application/octet-stream"});
-});
 
-builder.Services.AddSingleton(new RedisConnectionProvider(builder.Configuration["Redis:ConnectionString"]!));
+//Neo4j
 
 var client = new BoltGraphClient(builder.Configuration["Neo4j:ConnectionString"]!,
         builder.Configuration["Neo4j:Username"]!,
         builder.Configuration["Neo4j:Password"]!);
-
 client.ConnectAsync();
 builder.Services.AddSingleton<IGraphClient>(client);
 
-builder.Services.AddSignalR();
+//Redis
+
+builder.Services.AddSingleton<IConnectionMultiplexer>(ConnectionMultiplexer.Connect(builder.Configuration["Redis:ConnectionString"]!));
 
 //Services
 builder.Services.AddScoped<IUserService, UserService>();
@@ -70,24 +64,6 @@ if (app.Environment.IsDevelopment())
 }
 
 app.UseCors("CORS");
-
 app.UseHttpsRedirection();
-
 app.UseMiddleware<AuthMiddleware>();
-
-var webSocketOptions = new WebSocketOptions
-{
-    KeepAliveInterval = TimeSpan.FromMinutes(2)
-};
-
-webSocketOptions.AllowedOrigins.Add("http://localhost:3000");
-
-app.UseWebSockets(webSocketOptions);
-app.UseDefaultFiles();
-app.UseStaticFiles();
-
-app.MapControllers();
-
-app.MapHub<ChatHub>("/chathub");
-
 app.Run();

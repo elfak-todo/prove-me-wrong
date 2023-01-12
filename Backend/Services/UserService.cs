@@ -1,5 +1,4 @@
-using Redis.OM.Searching;
-using Redis.OM;
+using StackExchange.Redis;
 using Neo4jClient;
 using Backend.Models;
 using Microsoft.AspNetCore.Mvc;
@@ -16,24 +15,24 @@ public interface IUserService
     Task<ServiceResult<bool>> SetInterests(string userId, Tag[] tags);
     Task<ServiceResult<bool>> Register(UserRegisterData regData);
     Task<ServiceResult<UserDetails>> Login(UserLoginCreds user);
-    string? ValidateToken(string token);
+    Task<string?> ValidateToken(string token);
 }
 
 public class UserService : IUserService
 {
     private readonly IGraphClient _client;
-    private readonly RedisCollection<Session> _sessions;
-    private readonly RedisConnectionProvider _provider;
+    private readonly IConnectionMultiplexer _redis;
+    private readonly IDatabase _redisDb;
     private readonly IPasswordManager _passwordManager;
 
     public UserService(IGraphClient client,
-                        RedisConnectionProvider provider,
+                        IConnectionMultiplexer redis,
                         IPasswordManager passwordManager)
     {
         _client = client;
-        _provider = provider;
+        _redis = redis;
+        _redisDb = redis.GetDatabase();
         _passwordManager = passwordManager;
-        _sessions = (RedisCollection<Session>)provider.RedisCollection<Session>();
     }
 
     public async Task<ServiceResult<User>> GetById(string id)
@@ -216,8 +215,14 @@ public class UserService : IUserService
 
         User authUser = res.Result;
 
-        _sessions.Insert(new Session { UserID = authUser.ID, AccessToken = AccessToken });
-        _provider.Connection.Execute("EXPIRE", "session:" + AccessToken, "3600");
+        string sessionId = "session:" + AccessToken;
+
+        HashEntry[] entries = new HashEntry[2];
+        entries[0] = new HashEntry("UserID", authUser.ID);
+        entries[1] = new HashEntry("AccessToken", AccessToken);
+
+        await _redisDb.HashSetAsync(sessionId, entries);
+        await _redisDb.ExecuteAsync("EXPIRE", sessionId, "3600");
 
         return new ServiceResult<UserDetails>
         {
@@ -275,13 +280,10 @@ public class UserService : IUserService
         };
     }
 
-    public string? ValidateToken(string token)
+    public async Task<string?> ValidateToken(string token)
     {
-        Session? s = _sessions.FindById(token);
-        if (s == null)
-        {
-            return null;
-        }
-        return s.UserID;
+        string sessionId = "session:" + token;
+        string? userID = await _redisDb.HashGetAsync(sessionId, "UserID");
+        return userID;
     }
 }
