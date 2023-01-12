@@ -66,6 +66,18 @@ public class UserController : ControllerBase
         return Ok();
     }
 
+    [Route("interests")]
+    [HttpPost]
+    public async Task<IActionResult> SetInterests([FromBody] Tag[] tags)
+    {
+        var res = await _userService.SetInterests((string?)HttpContext.Items["UserID"]!, tags);
+
+        if (res.StatusCode != ServiceStatusCode.Success)
+            return BadRequest(res.ErrorMessage);
+
+        return Ok(res.StatusCode);
+    }
+
     [AllowAnonymous]
     [Route("register")]
     [HttpPost]

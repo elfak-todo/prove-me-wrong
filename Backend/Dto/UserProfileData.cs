@@ -9,4 +9,5 @@ public class UserProfileData
     public bool SentRequest { get; set; } = false;
     public bool ReceivedRequest { get; set; } = false;
     public List<User>? FriendList { get; set; }
+    public List<Tag>? Interests { get; set; }
 }

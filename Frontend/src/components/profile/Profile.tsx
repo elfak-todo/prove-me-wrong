@@ -24,6 +24,7 @@ import {
   respondToFriendRequest,
   sendFriendRequest,
 } from '../../services/user.service';
+import Interests from '../interests/Interests';
 
 interface ProfileProps {
   profileData: UserProfileData;
@@ -35,11 +36,9 @@ function Profile({ profileData, setProfileData }: ProfileProps) {
   const { postCount, topicCount } = profileData;
   const profUser = profileData.user;
 
-  const interests: string[] = ['Sports', 'Coding', 'Politics', 'TikTok'];
-
   const handleFriendRequest = () => {
     if (!profUser) return;
-    if(profileData.friends) return;
+    if (profileData.friends) return;
 
     if (profileData.receivedRequest) {
       respondToFriendRequest(profUser.id, true)
@@ -118,23 +117,10 @@ function Profile({ profileData, setProfileData }: ProfileProps) {
               variant="outlined"
             />
           </Stack>
-          <Typography mt={2} variant="subtitle1" color="text.secondary">
-            Interests
-          </Typography>
-          <ul className="chips-div">
-            {interests.map((data, index) => {
-              return (
-                <li key={index} style={{ marginRight: '5px' }}>
-                  <Chip
-                    label={data}
-                    color="primary"
-                    size="small"
-                    sx={{ padding: 0, margin: 0 }}
-                  />
-                </li>
-              );
-            })}
-          </ul>
+          <Interests
+            profileData={profileData}
+            setProfileData={setProfileData}
+          />
         </CardContent>
       </Stack>
     </Card>

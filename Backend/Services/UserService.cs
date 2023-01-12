@@ -13,6 +13,7 @@ public interface IUserService
     Task<List<User>> GetFriendRequests(string id);
     Task<ServiceResult<bool>> AddFriend(string userId, string friendId);
     Task<ServiceResult<bool>> RespondToFriendRequest(string userId, string friendId, bool accept);
+    Task<ServiceResult<bool>> SetInterests(string userId, Tag[] tags);
     Task<ServiceResult<bool>> Register(UserRegisterData regData);
     Task<ServiceResult<UserDetails>> Login(UserLoginCreds user);
     string? ValidateToken(string token);
@@ -86,6 +87,10 @@ public class UserService : IUserService
                                     FriendList = friend.CollectAs<User>()
                                 }).ResultsAsync;
 
+        var interestQuery = await _client.Cypher.Match("(user:User)-[INTERESTED_IN]->(interest:Tag)")
+                                .Where((User user) => user.ID == id)
+                                .Return(interest => interest.As<Tag>()).ResultsAsync;
+
         return query.Select(q => new UserProfileData
         {
             User = q.User,
@@ -94,7 +99,8 @@ public class UserService : IUserService
             Friends = q.Friends,
             SentRequest = q.SentRequest,
             ReceivedRequest = q.ReceivedRequest,
-            FriendList = q.FriendList.ToList()
+            FriendList = q.FriendList.ToList(),
+            Interests = interestQuery.ToList()
         }).Single();
     }
 
@@ -148,6 +154,24 @@ public class UserService : IUserService
 
         return new ServiceResult<bool> { Result = true, StatusCode = ServiceStatusCode.Success };
 
+    }
+
+    public async Task<ServiceResult<bool>> SetInterests(string userId, Tag[] tags)
+    {
+        await _client.Cypher.Match("(user:User)-[rel:INTERESTED_IN]->(interest:Tag)")
+                                .Where((User user) => user.ID == userId)
+                                .Delete("rel").ExecuteWithoutResultsAsync();
+
+        foreach (Tag t in tags)
+        {
+            await _client.Cypher.Match("(user:User), (tag:Tag)")
+                                    .Where((User user) => user.ID == userId)
+                                    .AndWhere((Tag tag) => tag.ID == t.ID)
+                                    .Create("(user)-[:INTERESTED_IN]->(tag)")
+                                    .ExecuteWithoutResultsAsync();
+        }
+
+        return new ServiceResult<bool> { Result = true, StatusCode = ServiceStatusCode.Success };
     }
 
     public async Task<ServiceResult<bool>> Register(UserRegisterData regData)

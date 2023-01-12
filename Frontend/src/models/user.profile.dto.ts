@@ -1,3 +1,4 @@
+import Tag from './tag';
 import User from './user';
 
 export default interface UserProfileData {
@@ -8,4 +9,5 @@ export default interface UserProfileData {
   sentRequest: boolean;
   receivedRequest: boolean;
   friendList: User[];
+  interests: Tag[];
 }

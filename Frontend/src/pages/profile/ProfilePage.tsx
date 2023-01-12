@@ -22,6 +22,7 @@ function ProfilePage() {
     sentRequest: false,
     receivedRequest: false,
     friendList: [],
+    interests: [],
   });
 
   useEffect(() => {

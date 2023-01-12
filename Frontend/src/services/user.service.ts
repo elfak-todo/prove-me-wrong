@@ -1,4 +1,5 @@
 import axios from 'axios';
+import Tag from '../models/tag';
 import User from '../models/user';
 import UserLoginDto from '../models/user.login.dto';
 import UserProfileData from '../models/user.profile.dto';
@@ -28,4 +29,8 @@ export const respondToFriendRequest = (friendId: string, accept: boolean) => {
   return axios.put(`/User/friendRequest/respond/${friendId}`, accept, {
     headers: { 'Content-Type': 'application/json' },
   });
+};
+
+export const editInterests = (tags: Tag[]) => {
+  return axios.post(`/User/interests/`, tags);
 };
