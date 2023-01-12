@@ -4,27 +4,55 @@ import FavoriteIcon from '@mui/icons-material/Favorite';
 import ModeCommentIcon from '@mui/icons-material/ModeComment';
 import ExpandMoreIcon from '@mui/icons-material/ExpandMore';
 import { Dispatch, SetStateAction, useState } from 'react';
-import Post from '../../../models/post';
+import { likeUnlinkePost } from '../../../services/post.service';
+import PostFeedData from '../../../models/post.feed.dto';
 
 interface PostFooterProps {
   isExpanded: boolean;
   setIsExpanded: Dispatch<SetStateAction<boolean>>;
-  post: Post;
+  feedEl: PostFeedData;
+  feed: PostFeedData[];
+  setFeed: Dispatch<SetStateAction<PostFeedData[]>>;
 }
 
-function PostFooter({ isExpanded, setIsExpanded, post }: PostFooterProps) {
-  const [isLiked, setIsLiked] = useState<boolean>(false);
+function PostFooter({
+  isExpanded,
+  setIsExpanded,
+  feedEl,
+  feed,
+  setFeed,
+}: PostFooterProps) {
+  const { post, liked, likeCount } = feedEl;
+  const [isLiked, setIsLiked] = useState<boolean>(liked);
+
+  const handleLiking = () => {
+    if (!post.id) return;
+
+    likeUnlinkePost(post.id, !isLiked)
+      .then(({ data }) => {
+        setIsLiked(data);
+        setFeed(
+          feed.map((p) => {
+            if (p.post.id === post.id) {
+              return { ...p, likeCount: p.likeCount + (data ? 1 : -1) };
+            }
+            return p;
+          })
+        );
+      })
+      .catch(({ error }) => console.log(error));
+  };
 
   return (
     <CardActions disableSpacing>
       <>
         <IconButton
           color={isLiked ? 'primary' : 'default'}
-          onClick={() => setIsLiked(!isLiked)}
+          onClick={handleLiking}
         >
           <FavoriteIcon />
         </IconButton>
-        {post.likeCount}
+        {likeCount}
       </>
       <>
         <IconButton onClick={() => setIsExpanded(!isExpanded)}>

@@ -20,7 +20,7 @@ public class PostController : ControllerBase
     [HttpGet]
     public async Task<IActionResult> GetFeed(string topicId)
     {
-        return Ok(await _postService.GetFeed(topicId));
+        return Ok(await _postService.GetFeed((string?)HttpContext.Items["UserID"]!, topicId));
     }
 
     [Route("profileFeed/{userId}")]
@@ -35,6 +35,18 @@ public class PostController : ControllerBase
     public async Task<IActionResult> Create([FromBody] Post post, string topicId)
     {
         var res = await _postService.Create((string?)HttpContext.Items["UserID"]!, topicId, post);
+
+        if (res.StatusCode != ServiceStatusCode.Success)
+            return BadRequest(res.ErrorMessage);
+
+        return Ok(res.Result);
+    }
+
+    [Route("setLiked/{postId}")]
+    [HttpPut]
+    public async Task<IActionResult> SetLiked([FromBody] bool isLiked, string postId)
+    {
+        var res = await _postService.SetLiked((string?)HttpContext.Items["UserID"]!, postId, isLiked);
 
         if (res.StatusCode != ServiceStatusCode.Success)
             return BadRequest(res.ErrorMessage);

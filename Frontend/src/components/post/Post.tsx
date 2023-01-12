@@ -23,9 +23,11 @@ function Post({ feedEl, feed, setFeed }: PostProps) {
         <Typography variant="body2">{post.text}</Typography>
       </CardContent>
       <PostFooter
-        post={post}
         isExpanded={isExpanded}
         setIsExpanded={setIsExpanded}
+        feedEl={feedEl}
+        feed={feed}
+        setFeed={setFeed}
       />
       <CommentSection isExpanded={isExpanded} />
     </Card>

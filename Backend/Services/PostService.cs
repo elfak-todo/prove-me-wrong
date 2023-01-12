@@ -4,10 +4,11 @@ using Neo4jClient;
 namespace Backend.Services;
 public interface IPostService
 {
-    Task<List<PostFeedData>> GetFeed(string topicID);
+    Task<List<PostFeedData>> GetFeed(string userId, string topicId);
     Task<List<PostFeedData>> GetUserFeed(string userId);
     Task<ServiceResult<PostFeedData>> Create(string authorID, string topicID, Post postData);
     Task<ServiceResult<Post>> Delete(string id);
+    Task<ServiceResult<bool>> SetLiked(string userId, string postId, bool isLiked);
 }
 
 public class PostService : IPostService
@@ -20,14 +21,21 @@ public class PostService : IPostService
         _userService = userService;
     }
 
-    public async Task<List<PostFeedData>> GetFeed(string topicID)
+    public async Task<List<PostFeedData>> GetFeed(string userId, string topicId)
     {
         var posts = await _client.Cypher.Match("(post:Post)-[:RELATED_TO]->(topic:Topic), (post:Post)-[:POSTED_BY]->(user:User)")
-                                    .Where((Topic topic) => topic.ID == topicID)
-                                    .Return((post, user) => new PostFeedData
+                                    .Where((Topic topic) => topic.ID == topicId)
+                                    .OptionalMatch("(post:Post)-[rel:LIKED_BY]->(viewer:User)")
+                                    .Where((User viewer) => viewer.ID == userId)
+                                    .With("post, user, CASE WHEN rel IS NOT NULL THEN true ELSE false END AS liked")
+                                    .OptionalMatch("(post:Post)-[rel:LIKED_BY]->()")
+                                    .With("post, user, liked, COUNT(rel) as likeCount")
+                                    .Return((post, user, liked, likeCount) => new PostFeedData
                                     {
                                         Post = post.As<Post>(),
-                                        Author = user.As<User>()
+                                        Author = user.As<User>(),
+                                        Liked = liked.As<bool>(),
+                                        LikeCount = likeCount.As<int>()
                                     }).ResultsAsync;
 
         return posts.ToList();
@@ -37,9 +45,17 @@ public class PostService : IPostService
     {
         var posts = await _client.Cypher.Match("(post:Post)-[:POSTED_BY]->(user:User)")
                                     .Where((User user) => user.ID == userId)
-                                    .Return((post, user) => new PostFeedData {
+                                    .OptionalMatch("(post:Post)-[rel:LIKED_BY]->(viewer:User)")
+                                    .Where((User viewer) => viewer.ID == userId)
+                                    .With("post, user, CASE WHEN rel IS NOT NULL THEN true ELSE false END AS liked")
+                                    .OptionalMatch("(post:Post)-[rel:LIKED_BY]->()")
+                                    .With("post, user, liked, COUNT(rel) as likeCount")
+                                    .Return((post, user, liked, likeCount) => new PostFeedData
+                                    {
                                         Post = post.As<Post>(),
-                                        Author = user.As<User>()
+                                        Author = user.As<User>(),
+                                        Liked = liked.As<bool>(),
+                                        LikeCount = likeCount.As<int>()
                                     }).ResultsAsync;
         return posts.ToList();
     }
@@ -91,5 +107,36 @@ public class PostService : IPostService
                                     .DetachDelete("post").ExecuteWithoutResultsAsync();
 
         return new ServiceResult<Post> { Result = post.FirstOrDefault(), StatusCode = ServiceStatusCode.Success };
+    }
+
+    public async Task<ServiceResult<bool>> SetLiked(string userId, string postId, bool isLiked)
+    {
+        var user = await _userService.GetById(userId);
+        if (user.Result == null)
+            return new ServiceResult<bool> { StatusCode = ServiceStatusCode.NotFound, ErrorMessage = "InvalidUser" };
+
+        var post = await _client.Cypher.Match("(post:Post)")
+                                    .Where((Post post) => post.ID == postId)
+                                    .Return(post => post.As<Post>()).ResultsAsync;
+        if (post.FirstOrDefault() == null)
+            return new ServiceResult<bool> { StatusCode = ServiceStatusCode.NotFound, ErrorMessage = "PostNotFound" };
+
+        if (isLiked)
+        {
+            await _client.Cypher.Match("(user:User), (post:Post)")
+                                    .Where((User user) => user.ID == userId)
+                                    .AndWhere((Post post) => post.ID == postId)
+                                    .Create("(post)-[:LIKED_BY]->(user)")
+                                    .ExecuteWithoutResultsAsync();
+        }
+        else
+        {
+            await _client.Cypher.Match("(post:Post)-[rel:LIKED_BY]->(user:User)")
+                                    .Where((User user, Post post) => user.ID == userId && post.ID == postId)
+                                    .Delete("rel")
+                                    .ExecuteWithoutResultsAsync();
+        }
+
+        return new ServiceResult<bool> { Result = isLiked, StatusCode = ServiceStatusCode.Success };
     }
 }
