@@ -16,10 +16,16 @@ export const getProfileData = (id: string) => {
   return axios.get<UserProfileData>(`/User/profile/${id}`);
 };
 
-export const sendFriendRequest = (friendId: string) => {
-  return axios.post(`/User/friendRequest/${friendId}`);
+export const getFriendRequests = () => {
+  return axios.get<User[]>(`/User/friendRequest/getAll`);
 };
 
-export const acceptFriendRequest = (friendId: string) => {
-  return axios.patch(`/User/acceptFriendRequest/${friendId}`);
+export const sendFriendRequest = (friendId: string) => {
+  return axios.post(`/User/friendRequest/send/${friendId}`);
+};
+
+export const respondToFriendRequest = (friendId: string, accept: boolean) => {
+  return axios.put(`/User/friendRequest/respond/${friendId}`, accept, {
+    headers: { 'Content-Type': 'application/json' },
+  });
 };

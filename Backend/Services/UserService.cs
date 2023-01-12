@@ -10,8 +10,9 @@ public interface IUserService
 {
     Task<ServiceResult<User>> GetById(string id);
     Task<UserProfileData> GetProfile(string viewerId, string id);
+    Task<List<User>> GetFriendRequests(string id);
     Task<ServiceResult<bool>> AddFriend(string userId, string friendId);
-    Task<ServiceResult<bool>> AcceptFriend(string userId, string friendId);
+    Task<ServiceResult<bool>> RespondToFriendRequest(string userId, string friendId, bool accept);
     Task<ServiceResult<bool>> Register(UserRegisterData regData);
     Task<ServiceResult<UserDetails>> Login(UserLoginCreds user);
     string? ValidateToken(string token);
@@ -58,8 +59,9 @@ public class UserService : IUserService
 
     public async Task<UserProfileData> GetProfile(string viewerId, string id)
     {
-        var query = await _client.Cypher.OptionalMatch("(t:Topic)-[:CREATED_BY]-(user:User)")
+        var query = await _client.Cypher.Match("(user:User)")
                                 .Where((User user) => user.ID == id)
+                                .OptionalMatch("(t:Topic)-[:CREATED_BY]-(user)")
                                 .With("user, COUNT(t) AS topicCount")
                                 .OptionalMatch("(p:Post)-[:POSTED_BY]-(user)")
                                 .With("user, topicCount, COUNT(p) AS postCount")
@@ -67,8 +69,10 @@ public class UserService : IUserService
                                 .Where((User viewer) => viewer.ID == viewerId)
                                 .With("user, topicCount, postCount, CASE WHEN r IS NOT NULL THEN true ELSE false END AS isFriend")
                                 .OptionalMatch("(viewer)-[r1:SENT_REQUEST]->(user)")
+                                .Where((User viewer) => viewer.ID == viewerId && viewer.ID != id)
                                 .With("user, topicCount, postCount, isFriend, CASE WHEN r1 IS NOT NULL THEN true ELSE false END AS sentRequest")
-                                .OptionalMatch("(viewer:User)<-[r2:SENT_REQUEST]-(user)")
+                                .OptionalMatch("(viewer)<-[r2:SENT_REQUEST]-(user)")
+                                .Where((User viewer) => viewer.ID == viewerId && viewer.ID != id)
                                 .With("user, topicCount, postCount, isFriend, sentRequest, CASE WHEN r2 IS NOT NULL THEN true ELSE false END AS receivedRequest")
                                 .OptionalMatch("(user)-[:FRIENDS]-(friend:User)")
                                 .Return((user, topicCount, postCount, isFriend, sentRequest, receivedRequest, friend) => new
@@ -94,12 +98,21 @@ public class UserService : IUserService
         }).Single();
     }
 
+    public async Task<List<User>> GetFriendRequests(string id)
+    {
+        var res = await _client.Cypher.Match("(user:User)<-[:SENT_REQUEST]-(friend:User)")
+                                .Where((User user) => user.ID == id)
+                                .Return(friend => friend.As<User>()).ResultsAsync;
+
+        return res.ToList();
+    }
+
     public async Task<ServiceResult<bool>> AddFriend(string userId, string friendId)
     {
         var res = await GetById(friendId);
 
         if (res.Result == null)
-            return new ServiceResult<bool> { StatusCode = ServiceStatusCode.NotFound, ErrorMessage = "FriendNotFoun" };
+            return new ServiceResult<bool> { StatusCode = ServiceStatusCode.NotFound, ErrorMessage = "FriendNotFound" };
 
         await _client.Cypher.Match("(user:User), (friend:User)")
                         .Where((User user, User friend) => user.ID == userId && friend.ID == friendId)
@@ -110,19 +123,28 @@ public class UserService : IUserService
 
     }
 
-    public async Task<ServiceResult<bool>> AcceptFriend(string userId, string friendId)
+    public async Task<ServiceResult<bool>> RespondToFriendRequest(string userId, string friendId, bool accept)
     {
         var res = await GetById(friendId);
 
         if (res.Result == null)
-            return new ServiceResult<bool> { StatusCode = ServiceStatusCode.NotFound, ErrorMessage = "FriendNotFoun" };
+            return new ServiceResult<bool> { StatusCode = ServiceStatusCode.NotFound, ErrorMessage = "FriendNotFound" };
 
-        await _client.Cypher
-                .Match("(user:User)<-[req:SENT_REQUEST]-(friend:User)")
-                .Where((User user, User friend) => user.ID == userId && friend.ID == friendId)
-                .Create("(user)<-[:FRIENDS]-(friend)")
-                .Delete("req")
-                .ExecuteWithoutResultsAsync();
+        if (!accept)
+        {
+            await _client.Cypher.Match("(user:User)<-[req:SENT_REQUEST]-(friend:User)")
+                        .Where((User user, User friend) => user.ID == userId && friend.ID == friendId)
+                        .Delete("req")
+                        .ExecuteWithoutResultsAsync();
+        }
+        else
+        {
+            await _client.Cypher.Match("(user:User)<-[req:SENT_REQUEST]-(friend:User)")
+                        .Where((User user, User friend) => user.ID == userId && friend.ID == friendId)
+                        .Create("(user)<-[:FRIENDS]-(friend)")
+                        .Delete("req")
+                        .ExecuteWithoutResultsAsync();
+        }
 
         return new ServiceResult<bool> { Result = true, StatusCode = ServiceStatusCode.Success };
 

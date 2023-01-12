@@ -21,7 +21,7 @@ import './Profile.css';
 import UserContext from '../userManager/UserManager';
 import { Dispatch, SetStateAction, useContext } from 'react';
 import {
-  acceptFriendRequest,
+  respondToFriendRequest,
   sendFriendRequest,
 } from '../../services/user.service';
 
@@ -42,7 +42,7 @@ function Profile({ profileData, setProfileData }: ProfileProps) {
     if(profileData.friends) return;
 
     if (profileData.receivedRequest) {
-      acceptFriendRequest(profUser.id)
+      respondToFriendRequest(profUser.id, true)
         .then((res) => {
           setProfileData({
             ...profileData,
@@ -101,19 +101,19 @@ function Profile({ profileData, setProfileData }: ProfileProps) {
           <Stack direction="row" spacing={2} mt={2}>
             <Chip
               icon={<PeopleIcon />}
-              label={`Friends 32`}
+              label={`Prijatelji ${profileData.friendList.length}`}
               color="primary"
               variant="outlined"
             />
             <Chip
               icon={<TopicIcon />}
-              label={`Topics ${topicCount}`}
+              label={`Teme ${topicCount}`}
               color="primary"
               variant="outlined"
             />
             <Chip
               icon={<ArticleIcon />}
-              label={`Posts ${postCount}`}
+              label={`Objave ${postCount}`}
               color="primary"
               variant="outlined"
             />

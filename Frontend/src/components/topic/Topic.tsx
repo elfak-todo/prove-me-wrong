@@ -98,7 +98,7 @@ function Topic({ feedEl }: TopicProps) {
               size={32}
             />
             <Typography mb={0} variant="body1" color="white">
-              {`${author.firstName} ${author.lastName} je započeo temu`}
+              {`${author.firstName} ${author.lastName} je započeo/la temu`}
             </Typography>
           </Box>
       </CardActions>

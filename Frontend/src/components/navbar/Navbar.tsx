@@ -1,23 +1,36 @@
 import { useLocation, useNavigate } from 'react-router';
 import {
+  Badge,
   BottomNavigation,
   BottomNavigationAction,
   Box,
+  Dialog,
   Paper,
 } from '@mui/material';
 import AccountBoxIcon from '@mui/icons-material/AccountBox';
 import LogoutIcon from '@mui/icons-material/Logout';
 import HomeIcon from '@mui/icons-material/Home';
+import NotificationsIcon from '@mui/icons-material/Notifications';
 
 import './Navbar.css';
 import UserContext from '../userManager/UserManager';
-import { useContext } from 'react';
+import { useContext, useEffect, useState } from 'react';
+import Notifications from '../notifications/Notifications';
+import { getFriendRequests } from '../../services/user.service';
+import User from '../../models/user';
 
 function Navbar() {
   const navigate = useNavigate();
   const { pathname } = useLocation();
-
   const { user, setUser } = useContext(UserContext);
+  const [isOpen, setIsOpen] = useState<boolean>(false);
+  const [requests, setRequests] = useState<User[]>([]);
+
+  useEffect(() => {
+    getFriendRequests()
+      .then(({ data }) => setRequests(data))
+      .catch(({ error }) => console.log(error));
+  }, [pathname]);
 
   return pathname !== '/' && pathname !== '/register' ? (
     <Paper
@@ -31,22 +44,44 @@ function Navbar() {
             sx={{ color: 'white' }}
             label="Početna strana"
             icon={<HomeIcon />}
-            onClick={() => navigate('/home')}
+            onClick={() => {
+              navigate('/home');
+              setIsOpen(false);
+            }}
+          />
+          <BottomNavigationAction
+            sx={{ color: 'white' }}
+            label="Obaveštenja"
+            icon={
+              <Badge badgeContent={requests.length} color="secondary">
+                <NotificationsIcon />
+              </Badge>
+            }
+            onClick={() => setIsOpen(true)}
           />
           <BottomNavigationAction
             sx={{ color: 'white' }}
             label="Profil"
             icon={<AccountBoxIcon />}
-            onClick={() => navigate(`/profile/${user?.id}`)}
+            onClick={() => {
+              navigate(`/profile/${user?.id}`);
+              setIsOpen(false);
+            }}
           />
           <BottomNavigationAction
             sx={{ color: 'white' }}
             label="Odjavi se"
             icon={<LogoutIcon />}
-            onClick={() => setUser(null)}
+            onClick={() => {
+              setUser(null);
+              setIsOpen(false);
+            }}
           />
         </BottomNavigation>
       </Box>
+      <Dialog open={isOpen} onClose={() => setIsOpen(false)} maxWidth="md">
+        <Notifications requests={requests} setRequests={setRequests} />
+      </Dialog>
     </Paper>
   ) : null;
 }

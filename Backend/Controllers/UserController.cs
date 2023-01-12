@@ -35,7 +35,14 @@ public class UserController : ControllerBase
         return Ok(await _userService.GetProfile((string?)HttpContext.Items["UserID"]!, id));
     }
 
-    [Route("friendRequest/{friendId}")]
+    [Route("friendRequest/getAll")]
+    [HttpGet]
+    public async Task<IActionResult> GetFriendRequests()
+    {
+        return Ok(await _userService.GetFriendRequests((string?)HttpContext.Items["UserID"]!));
+    }
+
+    [Route("friendRequest/send/{friendId}")]
     [HttpPost]
     public async Task<IActionResult> AddFriend(string friendId)
     {
@@ -47,11 +54,11 @@ public class UserController : ControllerBase
         return Ok();
     }
 
-    [Route("acceptFriendRequest/{friendId}")]
-    [HttpPatch]
-    public async Task<IActionResult> AcceptFriend(string friendId)
+    [Route("friendRequest/respond/{friendId}")]
+    [HttpPut]
+    public async Task<IActionResult> RespondToFriendRequest([FromBody] bool accept, string friendId)
     {
-        var res = await _userService.AcceptFriend((string?)HttpContext.Items["UserID"]!, friendId);
+        var res = await _userService.RespondToFriendRequest((string?)HttpContext.Items["UserID"]!, friendId, accept);
 
         if (res.StatusCode != ServiceStatusCode.Success)
             return BadRequest(res.ErrorMessage);
