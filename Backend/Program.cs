@@ -63,6 +63,8 @@ if (app.Environment.IsDevelopment())
     app.UseSwaggerUI();
 }
 
+app.MapControllers();
+
 app.UseCors("CORS");
 app.UseHttpsRedirection();
 app.UseMiddleware<AuthMiddleware>();

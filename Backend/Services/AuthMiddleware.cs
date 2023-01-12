@@ -17,7 +17,7 @@ public class AuthMiddleware
             if (authHeader != null && authHeader.StartsWith("Bearer"))
             {
                 string token = authHeader.Substring(7);
-                context.Items["UserID"] = userService.ValidateToken(token);
+                context.Items["UserID"] = await userService.ValidateToken(token);
             }
         }
         catch (Exception) { }

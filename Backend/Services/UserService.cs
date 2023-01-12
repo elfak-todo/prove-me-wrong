@@ -47,7 +47,7 @@ public class UserService : IUserService
             return new ServiceResult<User>
             {
                 StatusCode = ServiceStatusCode.NotFound,
-                ErrorMessage = "StudentNotFound"
+                ErrorMessage = "UserNotFound"
             };
 
         return new ServiceResult<User>
