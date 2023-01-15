@@ -28,6 +28,13 @@ public class UserController : ControllerBase
         return Ok(res.Result);
     }
 
+    [Route("search")]
+    [HttpGet]
+    public async Task<IActionResult> SearchUsers([FromQuery] string input)
+    {
+        return Ok(await _userService.GetByQuery(input));
+    }
+
     [Route("profile/{id}")]
     [HttpGet]
     public async Task<IActionResult> GetProfile(string id)
