@@ -22,6 +22,7 @@ public class TagController : ControllerBase
         return Ok(await _tagService.GetAll());
     }
 
+    [AllowAnonymous]
     [HttpPost]
     public async Task<IActionResult> Create([FromBody] Tag tagData)
     {

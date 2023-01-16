@@ -21,6 +21,10 @@ export const getFriendRequests = () => {
   return axios.get<User[]>(`/User/friendRequest/getAll`);
 };
 
+export const searchUsers = (input: string) => {
+  return axios.get<User[]>(`/User/search?input=${input}`);
+};
+
 export const sendFriendRequest = (friendId: string) => {
   return axios.post(`/User/friendRequest/send/${friendId}`);
 };

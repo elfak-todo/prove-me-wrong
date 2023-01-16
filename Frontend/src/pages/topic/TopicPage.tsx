@@ -1,6 +1,7 @@
 import { useEffect, useState } from 'react';
 import { useParams } from 'react-router';
 import PostFeed from '../../components/postFeed/PostFeed';
+import Search from '../../components/search/Search';
 import PostFeedData from '../../models/post.feed.dto';
 import { getPosts } from '../../services/post.service';
 
@@ -18,7 +19,12 @@ function TopicPage() {
       .catch(({ error }) => console.log(error));
   }, [topicId]);
 
-  return <PostFeed feed={feed} setFeed={setFeed} />;
+  return (
+    <>
+      <PostFeed feed={feed} setFeed={setFeed} />
+      <Search />
+    </>
+  );
 }
 
 export default TopicPage;

@@ -1,9 +1,16 @@
 import axios from 'axios';
-import { baseURL } from '../config';
 import { ITopic } from '../models/topic';
 
 export const getTopics = () => {
-  return axios.get(`${baseURL}/Topic/`);
+  return axios.get(`/Topic/`);
+};
+
+export const getTopicsByUserInterests = () => {
+  return axios.get(`/Topic/byUserInterests`);
+};
+
+export const getTopicsByTag = (tagId: string) => {
+  return axios.get(`/Topic/byTag/${tagId}`);
 };
 
 export const getUserTopics = (userId: string) => {
@@ -11,5 +18,5 @@ export const getUserTopics = (userId: string) => {
 };
 
 export const createTopic = (data: ITopic) => {
-  return axios.post(`${baseURL}/Topic/`, data);
+  return axios.post(`/Topic/`, data);
 };

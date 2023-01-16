@@ -8,6 +8,7 @@ namespace Backend.Services;
 public interface IUserService
 {
     Task<ServiceResult<User>> GetById(string id);
+    Task<List<User>> GetByQuery(string input);
     Task<UserProfileData> GetProfile(string viewerId, string id);
     Task<List<User>> GetFriendRequests(string id);
     Task<ServiceResult<bool>> AddFriend(string userId, string friendId);
@@ -55,6 +56,20 @@ public class UserService : IUserService
             Result = user,
             StatusCode = ServiceStatusCode.Success
         };
+    }
+
+    public async Task<List<User>> GetByQuery(string input)
+    {
+        string[] toks = input.Split(' ');
+        string t1 = toks[0];
+        string t2 = toks.Length > 1 ? toks[1] : string.Empty;
+
+        var users = await _client.Cypher.Match("(p:User)")
+                                .Where((User p) => p.FirstName.Contains(t1) || p.FirstName.Contains(t2) || p.LastName.Contains(t1) 
+                                                 || p.LastName.Contains(t2) || p.Username.Contains(t1) || p.Username.Contains(t2))
+                                .Return(p => p.As<User>()).ResultsAsync;
+
+        return users.ToList();
     }
 
     public async Task<UserProfileData> GetProfile(string viewerId, string id)

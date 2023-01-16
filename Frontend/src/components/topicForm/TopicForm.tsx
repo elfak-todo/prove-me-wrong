@@ -75,7 +75,6 @@ function TopicForm({ setIsOpen, feed, setFeed }: TopicFormProps) {
               <TextField
                 {...params}
                 label="Izaberite tagove"
-                placeholder="Programiranje, Sport, Politika..."
               />
             )}
             onChange={(event, value) => setTopic({ ...topic, tags: value })}

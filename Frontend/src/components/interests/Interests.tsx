@@ -108,7 +108,6 @@ function Interests({ profileData, setProfileData }: InterestsProps) {
               <TextField
                 {...params}
                 label="Izaberite interesovanja"
-                placeholder="Programiranje, Sport, Politika..."
               />
             )}
             onChange={(event, value) => setInterests(value)}
