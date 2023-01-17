@@ -26,6 +26,7 @@ builder.Services.AddScoped<IPasswordManager, PasswordManager>();
 builder.Services.AddScoped<ITopicService, TopicService>();
 builder.Services.AddScoped<IPostService, PostService>();
 builder.Services.AddScoped<ITagService, TagService>();
+builder.Services.AddScoped<ICommentService, CommentService>();
 
 builder.Services.AddCors(options =>
 {

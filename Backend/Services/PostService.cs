@@ -1,5 +1,7 @@
 using Backend.Models;
 using Neo4jClient;
+using StackExchange.Redis;
+
 
 namespace Backend.Services;
 public interface IPostService
@@ -14,9 +16,14 @@ public interface IPostService
 public class PostService : IPostService
 {
     private readonly IGraphClient _client;
+    private readonly IConnectionMultiplexer _redis;
+    private readonly IDatabase _redisDb;
     private readonly IUserService _userService;
-    public PostService(IGraphClient client, IUserService userService)
+    public PostService(IConnectionMultiplexer redis,
+        IGraphClient client, IUserService userService)
     {
+        _redis = redis;
+        _redisDb = redis.GetDatabase();
         _client = client;
         _userService = userService;
     }
@@ -35,8 +42,14 @@ public class PostService : IPostService
                                         Post = post.As<Post>(),
                                         Author = user.As<User>(),
                                         Liked = liked.As<bool>(),
-                                        LikeCount = likeCount.As<int>()
+                                        LikeCount = likeCount.As<int>(),
                                     }).ResultsAsync;
+
+        posts = posts.Select(p =>
+        {
+            p.CommentCount = (int)_redisDb.ListLength("comments:" + p.Post!.ID, CommandFlags.None);
+            return p;
+        });
 
         return posts.ToList();
     }
@@ -57,6 +70,13 @@ public class PostService : IPostService
                                         Liked = liked.As<bool>(),
                                         LikeCount = likeCount.As<int>()
                                     }).ResultsAsync;
+
+        posts = posts.Select(p =>
+        {
+            p.CommentCount = (int)_redisDb.ListLength("comments:" + p.Post!.ID, CommandFlags.None);
+            return p;
+        });
+
         return posts.ToList();
     }
 
@@ -105,6 +125,8 @@ public class PostService : IPostService
         await _client.Cypher.Match("(post:Post)")
                                     .Where((Post post) => post.ID == id)
                                     .DetachDelete("post").ExecuteWithoutResultsAsync();
+
+        await _redisDb.KeyDeleteAsync("comments:" + id);
 
         return new ServiceResult<Post> { Result = post.FirstOrDefault(), StatusCode = ServiceStatusCode.Success };
     }

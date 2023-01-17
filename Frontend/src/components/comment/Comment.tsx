@@ -1,17 +1,28 @@
-import { Avatar, Card, CardContent, Typography } from "@mui/material";
-import lukaImg from "../../images/luka.jpg";
-import CommentOptions from "../commentOptions/CommentOptions";
-import "./Comment.css";
+import { Card, CardContent, Typography } from '@mui/material';
+import { CommentDto } from '../../models/comment.dto';
+import UserAvatar from '../avatar/UserAvatar';
+import CommentOptions from '../commentOptions/CommentOptions';
+import './Comment.css';
 
-function Comment() {
+interface Props {
+  comment: CommentDto;
+}
+
+function Comment({ comment }: Props) {
   return (
     <div className="avatar-other">
-      <Avatar src={lukaImg} sx={{ width: 32, height: 32, mr: 1}} />
+      <UserAvatar
+        name={`${comment.author.firstName} ${comment.author.lastName}`}
+        size={32}
+      />
       <div className="name-text-div">
-        <Typography variant="body2">Luka Kocić</Typography>
+        <Typography variant="body2">
+          {comment.author.firstName} {comment.author.lastName} (
+          {comment.author.username})
+        </Typography>
         <Card className="comment-card" variant="outlined">
           <CardContent sx={{ padding: 1, margin: 0 }}>
-            <Typography variant="body2">Ovo je jako dobar komentar!</Typography>
+            <Typography variant="body2">{comment.text}</Typography>
           </CardContent>
         </Card>
       </div>

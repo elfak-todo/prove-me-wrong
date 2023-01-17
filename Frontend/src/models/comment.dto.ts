@@ -1,8 +1,8 @@
-import UserDto from "./user.dto";
+import UserDto from './user.dto';
 
 export interface CommentDto {
-  ID: string,
-  author: UserDto,
-  text: string,
-  publicationTime: string
+  id: string;
+  author: UserDto;
+  text: string;
+  publicationTime: string;
 }

@@ -1,5 +1,6 @@
 import { Card, CardContent, Typography } from '@mui/material';
 import { Dispatch, SetStateAction, useState } from 'react';
+import { CommentDto } from '../../models/comment.dto';
 import PostFeedData from '../../models/post.feed.dto';
 
 import CommentSection from '../commentSection/CommentSection';
@@ -16,6 +17,8 @@ function Post({ feedEl, feed, setFeed }: PostProps) {
   const [isExpanded, setIsExpanded] = useState<boolean>(false);
   const { post, author } = feedEl;
 
+  const [comments, setComments] = useState<CommentDto[] | null>(null);
+
   return (
     <Card sx={{ maxWidth: 800, minWidth: 700, marginTop: 5 }}>
       <PostHeader post={post} author={author} feed={feed} setFeed={setFeed} />
@@ -29,7 +32,15 @@ function Post({ feedEl, feed, setFeed }: PostProps) {
         feed={feed}
         setFeed={setFeed}
       />
-      <CommentSection isExpanded={isExpanded} />
+      {post.id && (
+        <CommentSection
+          isExpanded={isExpanded}
+          postId={post.id}
+          setFeed={setFeed}
+          comments={comments}
+          setComments={setComments}
+        />
+      )}
     </Card>
   );
 }

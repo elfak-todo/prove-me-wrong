@@ -8,4 +8,4 @@ export const getPostComments = (postId: string, page: number) => {
 
 export const createComment = (comment: CommentCreateDto) => {
   return axios.post<CommentDto>(`/Comment`, comment);
-}
+};

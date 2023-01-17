@@ -41,4 +41,19 @@ public class CommentController : ControllerBase
         return Ok(result.Result);
     }
 
+    [Route("")]
+    [HttpPut]
+    public async Task<IActionResult> UpdateComment([FromBody] CommentUpdateDto comment)
+    {
+        var userId = (string?)HttpContext.Items["UserID"]!;
+
+        var result = await _commentService.UpdateComment(comment, userId);
+
+        if (result.StatusCode != ServiceStatusCode.Success)
+        {
+            return BadRequest();
+        }
+
+        return Ok(result.Result);
+    }
 }

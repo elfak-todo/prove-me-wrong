@@ -1,18 +1,39 @@
 import { CardContent, Collapse } from '@mui/material';
-//import Comment from "../comment/Comment";
+import { Dispatch, SetStateAction } from 'react';
+import { CommentDto } from '../../models/comment.dto';
+import PostFeedData from '../../models/post.feed.dto';
 import CommentForm from '../commentForm/CommentForm';
 import CommentList from '../commentList/CommentList';
 
 interface CommentSectionProps {
   isExpanded: boolean;
+  postId: string;
+  setFeed: Dispatch<SetStateAction<PostFeedData[]>>;
+  comments: CommentDto[] | null;
+  setComments: Dispatch<SetStateAction<CommentDto[] | null>>;
 }
 
-function CommentSection({ isExpanded }: CommentSectionProps) {
+function CommentSection({
+  isExpanded,
+  postId,
+  setFeed,
+  setComments,
+  comments,
+}: CommentSectionProps) {
   return (
     <Collapse in={isExpanded} collapsedSize={55}>
       <CardContent sx={{ padding: 1 }}>
-        <CommentForm />
-        <CommentList isExpanded={isExpanded} />
+        <CommentForm
+          postId={postId}
+          setFeed={setFeed}
+          setComments={setComments}
+        />
+        <CommentList
+          isExpanded={isExpanded}
+          postId={postId}
+          comments={comments}
+          setComments={setComments}
+        />
       </CardContent>
     </Collapse>
   );

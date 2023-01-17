@@ -9,13 +9,13 @@ public interface ICommentService
 {
     Task<List<CommentDto>> GetPostComments(string postId, int page);
     Task<ServiceResult<CommentDto>> AddComment(CommentCreateDto comment, string authorId);
+    Task<ServiceResult<CommentDto>> UpdateComment(CommentUpdateDto comment, string userId);
 }
 
 public class CommentService : ICommentService
 {
     private readonly IConnectionMultiplexer _redis;
     private readonly IDatabase _redisDb;
-
     private readonly IUserService _userService;
 
     public CommentService(IConnectionMultiplexer redis, IUserService userService)
@@ -29,9 +29,9 @@ public class CommentService : ICommentService
     {
         string key = "comments:" + postId;
 
-        var list = await _redisDb.ListRangeAsync(key, page * 10, (page + 1) * 10);
+        var list = await _redisDb.ListRangeAsync(key, page * 10, (page + 1) * 10 - 1);
 
-        var comments = list.Select(redisValue => 
+        var comments = list.Select(redisValue =>
                 JsonSerializer.Deserialize<Comment?>(redisValue!)
             );
 
@@ -39,12 +39,13 @@ public class CommentService : ICommentService
 
         foreach (var comment in comments)
         {
-            var user = (await _userService.GetById(comment!.AuthorId)).Result;
+            var author = (await _userService.GetById(comment!.AuthorId)).Result;
             commentDtos.Add(new CommentDto()
             {
                 ID = comment.ID,
                 Text = comment.Text,
-                PublicationTime = comment.PublicationTime
+                PublicationTime = comment.PublicationTime,
+                Author = author
             });
         }
         return commentDtos;
@@ -58,7 +59,8 @@ public class CommentService : ICommentService
         string commentId = Guid.NewGuid().ToString();
         DateTime publicationTime = DateTime.Now;
 
-        Comment comment = new(){
+        Comment comment = new()
+        {
             ID = commentId,
             AuthorId = authorId,
             Text = commentCreateDto.Text,
@@ -67,7 +69,7 @@ public class CommentService : ICommentService
 
         string? serializedComment = JsonSerializer.Serialize(comment);
 
-        if(serializedComment == null)
+        if (serializedComment == null)
         {
             return new ServiceResult<CommentDto>()
             {
@@ -75,6 +77,8 @@ public class CommentService : ICommentService
                 ErrorMessage = "BadRequest",
             };
         }
+
+        //await _redisDb.SortedSetAddAsync(key, serializedComment, comment.PublicationTime.Ticks);
 
         await _redisDb.ListRightPushAsync(key, serializedComment);
 
@@ -93,5 +97,10 @@ public class CommentService : ICommentService
             StatusCode = ServiceStatusCode.Success,
             Result = commentDto
         };
+    }
+
+    public Task<ServiceResult<CommentDto>> UpdateComment(CommentUpdateDto comment, string userId)
+    {
+        throw new NotImplementedException();
     }
 }

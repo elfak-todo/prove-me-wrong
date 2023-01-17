@@ -22,7 +22,7 @@ function PostFooter({
   feed,
   setFeed,
 }: PostFooterProps) {
-  const { post, liked, likeCount } = feedEl;
+  const { post, liked, likeCount, commentCount } = feedEl;
   const [isLiked, setIsLiked] = useState<boolean>(liked);
 
   const handleLiking = () => {
@@ -58,7 +58,7 @@ function PostFooter({
         <IconButton onClick={() => setIsExpanded(!isExpanded)}>
           <ModeCommentIcon />
         </IconButton>
-        54
+        {commentCount}
       </>
       <ExpandMore
         expand={isExpanded}
