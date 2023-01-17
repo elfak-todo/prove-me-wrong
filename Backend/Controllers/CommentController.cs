@@ -56,4 +56,36 @@ public class CommentController : ControllerBase
 
         return Ok(result.Result);
     }
+
+    [Route("{postId}/{commentId}/set-liked/{liked}")]
+    [HttpPut]
+    public async Task<IActionResult> SetCommentLiked(string postId, string commentId, bool liked)
+    {
+        var userId = (string?)HttpContext.Items["UserID"]!;
+
+        var result = await _commentService.SetLiked(commentId, postId, userId, liked);
+
+        if (result.StatusCode != ServiceStatusCode.Success)
+        {
+            return BadRequest();
+        }
+
+        return Ok(result.Result);
+    }
+
+    [Route("{postId}/{commentId}")]
+    [HttpDelete]
+    public async Task<IActionResult> DeleteComment(string postId, string commentId)
+    {
+        var userId = (string?)HttpContext.Items["UserID"]!;
+
+        var result = await _commentService.DeleteComment(commentId, postId, userId);
+
+        if (result.StatusCode != ServiceStatusCode.Success)
+        {
+            return BadRequest();
+        }
+
+        return Ok(result.Result);
+    }
 }

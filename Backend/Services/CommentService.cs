@@ -10,6 +10,8 @@ public interface ICommentService
     Task<List<CommentDto>> GetPostComments(string postId, int page);
     Task<ServiceResult<CommentDto>> AddComment(CommentCreateDto comment, string authorId);
     Task<ServiceResult<CommentDto>> UpdateComment(CommentUpdateDto comment, string userId);
+    Task<ServiceResult<bool>> SetLiked(string commentId, string postId, string userId, bool liked);
+    Task<ServiceResult<string>> DeleteComment(string commentId, string postId, string userId);
 }
 
 public class CommentService : ICommentService
@@ -29,11 +31,15 @@ public class CommentService : ICommentService
     {
         string key = "comments:" + postId;
 
-        var list = await _redisDb.ListRangeAsync(key, page * 10, (page + 1) * 10 - 1);
+        int offset = page * 10;
 
-        var comments = list.Select(redisValue =>
-                JsonSerializer.Deserialize<Comment?>(redisValue!)
-            );
+        var list = await _redisDb.SortedSetRangeByRankAsync(key + ":newest", -10 - offset, -1 - offset, Order.Descending);
+
+        var comments = list.Select(commentId =>
+        {
+            var commentJson = _redisDb.StringGet("comment:" + commentId);
+            return JsonSerializer.Deserialize<Comment?>(commentJson!);
+        });
 
         List<CommentDto> commentDtos = new();
 
@@ -54,8 +60,6 @@ public class CommentService : ICommentService
     public async Task<ServiceResult<CommentDto>> AddComment(
         CommentCreateDto commentCreateDto, string authorId)
     {
-        string key = "comments:" + commentCreateDto.PostId;
-
         string commentId = Guid.NewGuid().ToString();
         DateTime publicationTime = DateTime.Now;
 
@@ -78,9 +82,12 @@ public class CommentService : ICommentService
             };
         }
 
-        //await _redisDb.SortedSetAddAsync(key, serializedComment, comment.PublicationTime.Ticks);
+        string postCommentsKey = "comments:" + commentCreateDto.PostId;
+        string commentKey = "comment:" + commentId;
 
-        await _redisDb.ListRightPushAsync(key, serializedComment);
+        await _redisDb.SortedSetAddAsync(postCommentsKey + ":newest", commentId, comment.PublicationTime.Ticks);
+        await _redisDb.SortedSetAddAsync(postCommentsKey + ":most-liked", commentId, 0);
+        await _redisDb.StringSetAsync(commentKey, serializedComment);
 
         var user = await _userService.GetById(authorId);
 
@@ -99,8 +106,94 @@ public class CommentService : ICommentService
         };
     }
 
-    public Task<ServiceResult<CommentDto>> UpdateComment(CommentUpdateDto comment, string userId)
+    public async Task<ServiceResult<CommentDto>> UpdateComment(CommentUpdateDto commentUpdateDto, string userId)
     {
-        throw new NotImplementedException();
+        string commentKey = "comment:" + commentUpdateDto.CommentId;
+
+        var jsonComment = await _redisDb.StringGetAsync(commentKey);
+        var comment = JsonSerializer.Deserialize<Comment?>(jsonComment!);
+
+        if (comment == null || comment.AuthorId != userId)
+        {
+            return new ServiceResult<CommentDto>()
+            {
+                StatusCode = ServiceStatusCode.Other,
+                ErrorMessage = "BadRequest",
+            };
+        }
+
+        comment.Text = commentUpdateDto.Text;
+
+        var updatedJson = JsonSerializer.Serialize<Comment>(comment);
+
+        await _redisDb.StringSetAsync(commentKey, updatedJson);
+
+        var user = await _userService.GetById(userId);
+
+        CommentDto commentDto = new()
+        {
+            ID = comment.ID,
+            Author = user.Result,
+            Text = comment.Text,
+            PublicationTime = comment.PublicationTime
+        };
+
+        return new ServiceResult<CommentDto>()
+        {
+            StatusCode = ServiceStatusCode.Success,
+            Result = commentDto
+        };
+    }
+
+    public async Task<ServiceResult<bool>> SetLiked(string commentId, string postId, string userId, bool liked)
+    {
+        string commentLikedKey = "user:" + userId + ":liked";
+        string mostLikedKey = "comments:" + postId + ":most-liked";
+
+        bool alreadyLiked = await _redisDb.SetContainsAsync(commentLikedKey, commentId);
+
+        if (liked && !alreadyLiked)
+        {
+            await _redisDb.SetAddAsync(commentLikedKey, commentId);
+            await _redisDb.SortedSetIncrementAsync(mostLikedKey, commentId, 1);
+        }
+        else if (!liked && alreadyLiked)
+        {
+            await _redisDb.SetAddAsync(commentLikedKey, commentId);
+            await _redisDb.SortedSetIncrementAsync(mostLikedKey, commentId, -1);
+        }
+
+        return new ServiceResult<bool>()
+        {
+            StatusCode = ServiceStatusCode.Success,
+            Result = liked
+        };
+    }
+
+    public async Task<ServiceResult<string>> DeleteComment(string commentId, string postId, string userId)
+    {
+        string commentKey = "comment:" + commentId;
+
+        var jsonComment = await _redisDb.StringGetAsync(commentKey);
+        var comment = JsonSerializer.Deserialize<Comment?>(jsonComment!);
+
+        if (comment == null || comment.AuthorId != userId)
+        {
+            return new ServiceResult<string>()
+            {
+                StatusCode = ServiceStatusCode.Other,
+                ErrorMessage = "BadRequest",
+            };
+        }
+        await _redisDb.KeyDeleteAsync(commentKey);
+        await _redisDb.SortedSetRemoveAsync("comments:" + postId + ":most-liked", commentId);
+        await _redisDb.SortedSetRemoveAsync("comments:" + postId + ":newest", commentId);
+        await _redisDb.SetRemoveAsync("user:" + userId + ":liked", commentId);
+
+        return new ServiceResult<string>()
+        {
+            StatusCode = ServiceStatusCode.Success,
+            Result = commentId
+        };
     }
 }

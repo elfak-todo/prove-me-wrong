@@ -51,7 +51,7 @@ function CommentForm({ postId, setFeed, setComments }: Props) {
         if (!comments) {
           return [res];
         }
-        return [...comments, res];
+        return [res, ...comments];
       });
       setFeed((feed) =>
         feed.map((p) => {

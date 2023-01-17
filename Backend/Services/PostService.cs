@@ -47,7 +47,7 @@ public class PostService : IPostService
 
         posts = posts.Select(p =>
         {
-            p.CommentCount = (int)_redisDb.ListLength("comments:" + p.Post!.ID, CommandFlags.None);
+            p.CommentCount = (int)_redisDb.SortedSetLength("comments:" + p.Post!.ID + ":newest");
             return p;
         });
 
@@ -73,7 +73,7 @@ public class PostService : IPostService
 
         posts = posts.Select(p =>
         {
-            p.CommentCount = (int)_redisDb.ListLength("comments:" + p.Post!.ID, CommandFlags.None);
+            p.CommentCount = (int)_redisDb.SortedSetLength("comments:" + p.Post!.ID + ":newest");
             return p;
         });
 
@@ -126,7 +126,8 @@ public class PostService : IPostService
                                     .Where((Post post) => post.ID == id)
                                     .DetachDelete("post").ExecuteWithoutResultsAsync();
 
-        await _redisDb.KeyDeleteAsync("comments:" + id);
+        await _redisDb.KeyDeleteAsync("comments:" + id + ":newest");
+        await _redisDb.KeyDeleteAsync("comments:" + id + ":most-liked");
 
         return new ServiceResult<Post> { Result = post.FirstOrDefault(), StatusCode = ServiceStatusCode.Success };
     }
