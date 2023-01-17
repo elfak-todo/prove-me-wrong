@@ -17,12 +17,18 @@ public class CommentController : ControllerBase
         _commentService = commentService;
     }
 
-    [Route("{postId}/{page}")]
+    [Route("{postId}/{page}/{sortType}")]
     [HttpGet]
-    public async Task<IActionResult> GetPostComments(string postId, int page)
+    public async Task<IActionResult> GetPostComments(string postId, int page, string sortType)
     {
-        var comments = await _commentService.GetPostComments(postId, page);
-        return Ok(comments);
+        var result = await _commentService.GetPostComments(postId, page, sortType);
+
+        if (result.StatusCode != ServiceStatusCode.Success)
+        {
+            return BadRequest(result.ErrorMessage);
+        }
+
+        return Ok(result.Result);
     }
 
     [Route("")]
@@ -35,7 +41,7 @@ public class CommentController : ControllerBase
 
         if (result.StatusCode != ServiceStatusCode.Success)
         {
-            return BadRequest();
+            return BadRequest(result.ErrorMessage);
         }
 
         return Ok(result.Result);
@@ -51,7 +57,7 @@ public class CommentController : ControllerBase
 
         if (result.StatusCode != ServiceStatusCode.Success)
         {
-            return BadRequest();
+            return BadRequest(result.ErrorMessage);
         }
 
         return Ok(result.Result);
@@ -67,7 +73,7 @@ public class CommentController : ControllerBase
 
         if (result.StatusCode != ServiceStatusCode.Success)
         {
-            return BadRequest();
+            return BadRequest(result.ErrorMessage);
         }
 
         return Ok(result.Result);
@@ -83,7 +89,7 @@ public class CommentController : ControllerBase
 
         if (result.StatusCode != ServiceStatusCode.Success)
         {
-            return BadRequest();
+            return BadRequest(result.ErrorMessage);
         }
 
         return Ok(result.Result);

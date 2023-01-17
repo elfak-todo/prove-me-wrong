@@ -126,6 +126,14 @@ public class PostService : IPostService
                                     .Where((Post post) => post.ID == id)
                                     .DetachDelete("post").ExecuteWithoutResultsAsync();
 
+
+        var commentIds = await _redisDb.SortedSetRangeByScoreAsync("comments:" + id + ":newest");
+
+        foreach (var commentId in commentIds)
+        {
+            await _redisDb.KeyDeleteAsync("comment:" + commentId);
+        }
+
         await _redisDb.KeyDeleteAsync("comments:" + id + ":newest");
         await _redisDb.KeyDeleteAsync("comments:" + id + ":most-liked");
 

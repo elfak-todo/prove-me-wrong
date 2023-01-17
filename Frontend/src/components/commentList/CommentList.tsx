@@ -16,7 +16,7 @@ function CommentList({ isExpanded, postId, comments, setComments }: Props) {
   useEffect(() => {
     const loadComments = async () => {
       try {
-        const coms = (await getPostComments(postId, 0)).data;
+        const coms = (await getPostComments(postId, 0, 'newest')).data;
         setComments(coms);
         console.log(coms);
       } catch (e) {

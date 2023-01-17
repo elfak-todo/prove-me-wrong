@@ -6,4 +6,5 @@ public class CommentDto
     public User? Author { get; set; }
     public string Text { get; set; } = string.Empty;
     public DateTime PublicationTime { get; set; }
+    public int LikeCount { get; set; } = 0;
 }

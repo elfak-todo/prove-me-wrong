@@ -7,7 +7,7 @@ namespace Backend.Services;
 
 public interface ICommentService
 {
-    Task<List<CommentDto>> GetPostComments(string postId, int page);
+    Task<ServiceResult<List<CommentDto>>> GetPostComments(string postId, int page, string sortType);
     Task<ServiceResult<CommentDto>> AddComment(CommentCreateDto comment, string authorId);
     Task<ServiceResult<CommentDto>> UpdateComment(CommentUpdateDto comment, string userId);
     Task<ServiceResult<bool>> SetLiked(string commentId, string postId, string userId, bool liked);
@@ -27,13 +27,22 @@ public class CommentService : ICommentService
         _userService = userService;
     }
 
-    public async Task<List<CommentDto>> GetPostComments(string postId, int page)
+    public async Task<ServiceResult<List<CommentDto>>> GetPostComments(string postId, int page, string sortType)
     {
-        string key = "comments:" + postId;
+        if (sortType != "newest" && sortType != "most-liked")
+        {
+            return new ServiceResult<List<CommentDto>>()
+            {
+                StatusCode = ServiceStatusCode.Other,
+                ErrorMessage = "BadRequest",
+            };
+        }
+
+        string key = "comments:" + postId + ":" + sortType;
 
         int offset = page * 10;
 
-        var list = await _redisDb.SortedSetRangeByRankAsync(key + ":newest", -10 - offset, -1 - offset, Order.Descending);
+        var list = await _redisDb.SortedSetRangeByRankAsync(key, -10 - offset, -1 - offset, Order.Descending);
 
         var comments = list.Select(commentId =>
         {
@@ -52,9 +61,15 @@ public class CommentService : ICommentService
                 Text = comment.Text,
                 PublicationTime = comment.PublicationTime,
                 Author = author
+
             });
         }
-        return commentDtos;
+
+        return new ServiceResult<List<CommentDto>>()
+        {
+            StatusCode = ServiceStatusCode.Success,
+            Result = commentDtos
+        };
     }
 
     public async Task<ServiceResult<CommentDto>> AddComment(
