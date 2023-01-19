@@ -38,8 +38,8 @@ function ProfileFeed({ userId }: ProfileFeedProps) {
         textColor="primary"
         indicatorColor="primary"
       >
-        <Tab value={1} label="Topics" />
-        <Tab value={2} label="Posts" />
+        <Tab value={1} label="Teme" />
+        <Tab value={2} label="Objave" />
       </Tabs>
       {tab === 1 && <TopicFeed feed={topics} setFeed={setTopics} />}
       {tab === 2 && <PostFeed feed={posts} setFeed={setPosts} />}

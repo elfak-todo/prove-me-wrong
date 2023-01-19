@@ -64,7 +64,7 @@ function Topic({ feedEl }: TopicProps) {
             <Button
               variant="contained"
               size="small"
-              onClick={() => navigate(`/topic/${topic.id}`)}
+              onClick={() => navigate(`/topic/${topic.id}`, { state: topic })}
             >
               Istraži
             </Button>
@@ -86,21 +86,21 @@ function Topic({ feedEl }: TopicProps) {
         </CardContent>
       </Collapse>
       <CardActions>
-          <Box
-            sx={{
-              display: 'flex',
-              alignItems: 'center',
-            }}
-          >
-            <UserAvatar
-              id={author.id}
-              name={`${author.firstName} ${author.lastName}`}
-              size={32}
-            />
-            <Typography mb={0} variant="body1" color="white">
-              {`${author.firstName} ${author.lastName} je započeo/la temu`}
-            </Typography>
-          </Box>
+        <Box
+          sx={{
+            display: 'flex',
+            alignItems: 'center',
+          }}
+        >
+          <UserAvatar
+            id={author.id}
+            name={`${author.firstName} ${author.lastName}`}
+            size={32}
+          />
+          <Typography mb={0} variant="body1" color="white">
+            {`${author.firstName} ${author.lastName} je započeo/la temu`}
+          </Typography>
+        </Box>
       </CardActions>
     </Card>
   );

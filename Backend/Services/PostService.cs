@@ -7,6 +7,7 @@ public interface IPostService
     Task<List<PostFeedData>> GetFeed(string userId, string topicId);
     Task<List<PostFeedData>> GetUserFeed(string userId);
     Task<ServiceResult<PostFeedData>> Create(string authorID, string topicID, Post postData);
+    Task<ServiceResult<bool>> Update(string id, string text);
     Task<ServiceResult<Post>> Delete(string id);
     Task<ServiceResult<bool>> SetLiked(string userId, string postId, bool isLiked);
 }
@@ -30,6 +31,7 @@ public class PostService : IPostService
                                     .With("post, user, CASE WHEN rel IS NOT NULL THEN true ELSE false END AS liked")
                                     .OptionalMatch("(post:Post)-[rel:LIKED_BY]->()")
                                     .With("post, user, liked, COUNT(rel) as likeCount")
+                                    .OrderByDescending("likeCount")
                                     .Return((post, user, liked, likeCount) => new PostFeedData
                                     {
                                         Post = post.As<Post>(),
@@ -91,6 +93,26 @@ public class PostService : IPostService
             Result = new PostFeedData { Author = author.Result, Post = newPost.Single() },
             StatusCode = ServiceStatusCode.Success
         };
+    }
+
+    public async Task<ServiceResult<bool>> Update(string id, string text)
+    {
+        var post = await _client.Cypher.Match("(post:Post)")
+                                    .Where((Post post) => post.ID == id)
+                                    .Return(post => post.As<Post>()).ResultsAsync;
+
+        var p = post.FirstOrDefault();
+        if (p == null)
+            return new ServiceResult<bool> { StatusCode = ServiceStatusCode.NotFound, ErrorMessage = "PostNotFound" };
+
+        p.Text = text;
+        await _client.Cypher.Match("(post:Post)")
+                            .Where((Post post) => post.ID == id)
+                            .Set("post = $updated_post")
+                            .WithParam("updated_post", p)
+                            .ExecuteWithoutResultsAsync();
+
+        return new ServiceResult<bool> { Result = true, StatusCode = ServiceStatusCode.Success };
     }
 
     public async Task<ServiceResult<Post>> Delete(string id)

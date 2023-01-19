@@ -42,6 +42,18 @@ public class PostController : ControllerBase
         return Ok(res.Result);
     }
 
+    [Route("edit/{postId}")]
+    [HttpPut]
+    public async Task<IActionResult> Edit([FromBody] string text, string postId)
+    {
+        var res = await _postService.Update(postId, text);
+
+        if (res.StatusCode != ServiceStatusCode.Success)
+            return BadRequest(res.ErrorMessage);
+
+        return Ok(res.Result);
+    }
+
     [Route("setLiked/{postId}")]
     [HttpPut]
     public async Task<IActionResult> SetLiked([FromBody] bool isLiked, string postId)
