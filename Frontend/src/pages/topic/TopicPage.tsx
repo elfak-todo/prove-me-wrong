@@ -1,26 +1,42 @@
+import Typography from '@mui/material/Typography';
+import { Box } from '@mui/system';
 import { useEffect, useState } from 'react';
-import { useParams } from 'react-router';
+import { useLocation } from 'react-router';
 import PostFeed from '../../components/postFeed/PostFeed';
 import Search from '../../components/search/Search';
 import PostFeedData from '../../models/post.feed.dto';
+import { ITopic } from '../../models/topic';
 import { getPosts } from '../../services/post.service';
 
 import './TopicPage.css';
 
 function TopicPage() {
-  const topicId: string | undefined = useParams().topicId;
   const [feed, setFeed] = useState<PostFeedData[]>([]);
+  const { state } = useLocation();
+  const topic: ITopic = state;
 
   useEffect(() => {
-    if (!topicId) return;
+    if (!topic.id) return;
 
-    getPosts(topicId)
+    getPosts(topic.id)
       .then(({ data }) => setFeed(data))
       .catch(({ error }) => console.log(error));
-  }, [topicId]);
+  }, [topic]);
 
   return (
     <>
+      <Box sx={{ display: 'flex', justifyContent: 'center', mt: 8 }}>
+        <Box
+          sx={{ display: 'flex', flexDirection: 'column', alignItems: 'center' }}
+        >
+          <Typography variant="h6" color="primary">
+           <strong> {topic.title}</strong>
+          </Typography>
+          <Typography variant="body1" color="primary">
+            {topic.description}
+          </Typography>
+        </Box>
+      </Box>
       <PostFeed feed={feed} setFeed={setFeed} />
       <Search />
     </>
