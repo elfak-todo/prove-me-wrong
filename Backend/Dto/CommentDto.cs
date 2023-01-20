@@ -7,4 +7,5 @@ public class CommentDto
     public string Text { get; set; } = string.Empty;
     public DateTime PublicationTime { get; set; }
     public int LikeCount { get; set; } = 0;
+    public bool IsLiked { get; set; } = false;
 }

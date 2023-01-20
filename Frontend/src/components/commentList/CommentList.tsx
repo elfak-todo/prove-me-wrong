@@ -1,6 +1,8 @@
 import CircularProgress from '@mui/material/CircularProgress';
-import { Dispatch, SetStateAction, useEffect } from 'react';
+import { Dispatch, SetStateAction, useEffect, useState } from 'react';
 import { CommentDto } from '../../models/comment.dto';
+import PostFeedData from '../../models/post.feed.dto';
+import { SnackbarSettings } from '../../models/snackbar-settings';
 import { getPostComments } from '../../services/comment.service';
 import Comment from '../comment/Comment';
 import './CommentList.css';
@@ -10,24 +12,35 @@ interface Props {
   postId: string;
   comments: CommentDto[] | null;
   setComments: Dispatch<SetStateAction<CommentDto[] | null>>;
+  setSnackbar: Dispatch<SetStateAction<SnackbarSettings>>;
+  setFeed: Dispatch<SetStateAction<PostFeedData[]>>;
 }
 
-function CommentList({ isExpanded, postId, comments, setComments }: Props) {
+function CommentList({
+  isExpanded,
+  postId,
+  comments,
+  setComments,
+  setSnackbar,
+  setFeed,
+}: Props) {
+  const [commentsLoaded, setCommentsLoaded] = useState<boolean>(false);
+
   useEffect(() => {
     const loadComments = async () => {
       try {
         const coms = (await getPostComments(postId, 0, 'newest')).data;
         setComments(coms);
-        console.log(coms);
+        setCommentsLoaded(true);
       } catch (e) {
         console.error(e);
       }
     };
 
-    if (isExpanded && comments === null) {
+    if (isExpanded && !commentsLoaded) {
       loadComments();
     }
-  }, [isExpanded, comments, postId, setComments]);
+  }, [isExpanded, commentsLoaded, postId, setComments]);
 
   if (comments === null) {
     return (
@@ -48,7 +61,14 @@ function CommentList({ isExpanded, postId, comments, setComments }: Props) {
   return (
     <div className="comment-list">
       {comments.map((c) => (
-        <Comment comment={c} key={c.id} />
+        <Comment
+          comment={c}
+          key={c.id}
+          setComments={setComments}
+          postId={postId}
+          setSnackbar={setSnackbar}
+          setFeed={setFeed}
+        />
       ))}
     </div>
   );

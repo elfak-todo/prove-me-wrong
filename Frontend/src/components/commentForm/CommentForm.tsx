@@ -1,10 +1,9 @@
 import { Stack, TextField } from '@mui/material';
-import Alert, { AlertColor } from '@mui/material/Alert';
-import Snackbar from '@mui/material/Snackbar';
-import { Dispatch, SetStateAction, useContext, useRef, useState } from 'react';
+import { Dispatch, SetStateAction, useContext, useRef } from 'react';
 import { CommentCreateDto } from '../../models/comment.create.dto';
 import { CommentDto } from '../../models/comment.dto';
 import PostFeedData from '../../models/post.feed.dto';
+import { SnackbarSettings } from '../../models/snackbar-settings';
 import { createComment } from '../../services/comment.service';
 
 import UserAvatar from '../avatar/UserAvatar';
@@ -14,20 +13,11 @@ interface Props {
   postId: string;
   setFeed: Dispatch<SetStateAction<PostFeedData[]>>;
   setComments: Dispatch<SetStateAction<CommentDto[] | null>>;
+  setSnackbar: Dispatch<SetStateAction<SnackbarSettings>>;
 }
 
-function CommentForm({ postId, setFeed, setComments }: Props) {
+function CommentForm({ postId, setFeed, setComments, setSnackbar }: Props) {
   const { user } = useContext(UserContext);
-
-  const [snackbar, setSnackbar] = useState<{
-    open: boolean;
-    message: string;
-    severity: AlertColor;
-  }>({
-    open: false,
-    message: '',
-    severity: 'success',
-  });
 
   const commentTextFieldRef = useRef<HTMLTextAreaElement>(null);
 
@@ -71,40 +61,24 @@ function CommentForm({ postId, setFeed, setComments }: Props) {
     }
   };
 
-  const handleSnackbarClose = () => {
-    setSnackbar((s) => {
-      return { ...s, open: false };
-    });
-  };
-
   return (
-    <>
-      <Stack direction="row" spacing={1}>
-        <UserAvatar name={`${user?.firstName} ${user?.lastName}`} size={32} />
-        <TextField
-          size="small"
-          fullWidth
-          multiline
-          rows={1}
-          placeholder="Ostavi komentar"
-          inputRef={commentTextFieldRef}
-          onKeyPress={(ev) => {
-            if (ev.key === 'Enter' && !ev.shiftKey) {
-              onPostComment();
-              ev.preventDefault();
-            }
-          }}
-        />
-      </Stack>
-      <Snackbar
-        open={snackbar.open}
-        autoHideDuration={1500}
-        onClose={handleSnackbarClose}
-        anchorOrigin={{ vertical: 'top', horizontal: 'center' }}
-      >
-        <Alert severity={snackbar.severity}>{snackbar.message}</Alert>
-      </Snackbar>
-    </>
+    <Stack direction="row" spacing={1}>
+      <UserAvatar name={`${user?.firstName} ${user?.lastName}`} size={32} />
+      <TextField
+        size="small"
+        fullWidth
+        multiline
+        rows={1}
+        placeholder="Ostavi komentar"
+        inputRef={commentTextFieldRef}
+        onKeyPress={(ev) => {
+          if (ev.key === 'Enter' && !ev.shiftKey) {
+            onPostComment();
+            ev.preventDefault();
+          }
+        }}
+      />
+    </Stack>
   );
 }
 

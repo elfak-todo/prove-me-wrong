@@ -7,7 +7,7 @@ namespace Backend.Services;
 
 public interface ICommentService
 {
-    Task<ServiceResult<List<CommentDto>>> GetPostComments(string postId, int page, string sortType);
+    Task<ServiceResult<List<CommentDto>>> GetPostComments(string postId, int page, string sortType, string userId);
     Task<ServiceResult<CommentDto>> AddComment(CommentCreateDto comment, string authorId);
     Task<ServiceResult<CommentDto>> UpdateComment(CommentUpdateDto comment, string userId);
     Task<ServiceResult<bool>> SetLiked(string commentId, string postId, string userId, bool liked);
@@ -27,7 +27,7 @@ public class CommentService : ICommentService
         _userService = userService;
     }
 
-    public async Task<ServiceResult<List<CommentDto>>> GetPostComments(string postId, int page, string sortType)
+    public async Task<ServiceResult<List<CommentDto>>> GetPostComments(string postId, int page, string sortType, string userId)
     {
         if (sortType != "newest" && sortType != "most-liked")
         {
@@ -55,13 +55,17 @@ public class CommentService : ICommentService
         foreach (var comment in comments)
         {
             var author = (await _userService.GetById(comment!.AuthorId)).Result;
+            var likeCount = await _redisDb.SortedSetScoreAsync("comments:" + postId + ":most-liked", comment.ID);
+            var isLiked = await _redisDb.SetContainsAsync("user:" + userId + ":liked", comment.ID);
+
             commentDtos.Add(new CommentDto()
             {
                 ID = comment.ID,
                 Text = comment.Text,
                 PublicationTime = comment.PublicationTime,
-                Author = author
-
+                Author = author,
+                LikeCount = (int)likeCount,
+                IsLiked = isLiked
             });
         }
 
@@ -175,7 +179,8 @@ public class CommentService : ICommentService
         else if (!liked && alreadyLiked)
         {
             await _redisDb.SetAddAsync(commentLikedKey, commentId);
-            await _redisDb.SortedSetIncrementAsync(mostLikedKey, commentId, -1);
+            await _redisDb.SortedSetDecrementAsync(mostLikedKey, commentId, 1);
+            await _redisDb.SetRemoveAsync(commentLikedKey, commentId);
         }
 
         return new ServiceResult<bool>()

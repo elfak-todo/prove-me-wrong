@@ -21,7 +21,9 @@ public class CommentController : ControllerBase
     [HttpGet]
     public async Task<IActionResult> GetPostComments(string postId, int page, string sortType)
     {
-        var result = await _commentService.GetPostComments(postId, page, sortType);
+        var userId = (string?)HttpContext.Items["UserID"]!;
+
+        var result = await _commentService.GetPostComments(postId, page, sortType, userId);
 
         if (result.StatusCode != ServiceStatusCode.Success)
         {
