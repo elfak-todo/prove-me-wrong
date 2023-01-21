@@ -1,6 +1,7 @@
 using Backend.Services;
 using StackExchange.Redis;
 using Neo4jClient;
+using Backend.Hubs;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -8,19 +9,23 @@ builder.Services.AddControllers();
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
 
-//Neo4j
+// Neo4j
 
-var client = new BoltGraphClient(builder.Configuration["Neo4j:ConnectionString"]!,
+var neo4jClient = new BoltGraphClient(builder.Configuration["Neo4j:ConnectionString"]!,
         builder.Configuration["Neo4j:Username"]!,
         builder.Configuration["Neo4j:Password"]!);
-client.ConnectAsync();
-builder.Services.AddSingleton<IGraphClient>(client);
+neo4jClient.ConnectAsync();
+builder.Services.AddSingleton<IGraphClient>(neo4jClient);
 
-//Redis
+// Redis
 
-builder.Services.AddSingleton<IConnectionMultiplexer>(ConnectionMultiplexer.Connect(builder.Configuration["Redis:ConnectionString"]!));
+var redisClient = ConnectionMultiplexer.Connect(builder.Configuration["Redis:ConnectionString"]!);
+builder.Services.AddSingleton<IConnectionMultiplexer>(redisClient);
 
-//Services
+builder.Services.AddSignalR();
+
+// Services
+
 builder.Services.AddScoped<IUserService, UserService>();
 builder.Services.AddScoped<IPasswordManager, PasswordManager>();
 builder.Services.AddScoped<ITopicService, TopicService>();
@@ -57,16 +62,17 @@ builder.Services.AddAuthentication();
 
 var app = builder.Build();
 
-// Configure the HTTP request pipeline.
 if (app.Environment.IsDevelopment())
 {
     app.UseSwagger();
     app.UseSwaggerUI();
 }
 
+app.MapHub<ChatHub>("/ChatHub");
 app.MapControllers();
 
 app.UseCors("CORS");
 app.UseHttpsRedirection();
 app.UseMiddleware<AuthMiddleware>();
+
 app.Run();

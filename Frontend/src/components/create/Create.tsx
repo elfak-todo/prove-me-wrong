@@ -19,8 +19,8 @@ function Create({ Form, feed, setFeed }: CreateProps) {
       <Fab
         sx={{
           position: 'fixed',
-          bottom: 10,
-          right: 10,
+          top: '5rem',
+          left: 10,
         }}
         color="primary"
         onClick={() => setIsOpen(true)}

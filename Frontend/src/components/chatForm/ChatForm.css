@@ -1,0 +1,10 @@
+.chat-form {
+  padding: 1rem;
+  border-radius: 0 0 8px 8px;
+  background-color: rgb(124, 184, 253);
+  color: white;
+}
+
+.chat-form > input {
+  color: white !important;
+}

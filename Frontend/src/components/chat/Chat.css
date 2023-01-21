@@ -1,0 +1,17 @@
+.chat-container {
+  width: 25%;
+  height: calc(100vh - 2rem);
+  position: fixed;
+  top: 1rem;
+  right: 1rem;
+  background-color: rgb(154, 201, 255);
+  border-radius: 8px;
+  display: flex;
+  flex-direction: column;
+  justify-content: stretch;
+  color: rgb(21, 101, 192);
+}
+
+.chat-container > h2 {
+  text-align: center;
+}

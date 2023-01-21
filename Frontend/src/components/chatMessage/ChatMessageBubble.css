@@ -1,0 +1,37 @@
+.chat-message-bubble {
+  display: flex;
+  flex-direction: row;
+  margin: 0.5rem;
+  gap: 5px;
+  max-width: 70%;
+  color: white;
+}
+
+.chat-message {
+  color: darkblue;
+  padding: 1rem;
+  background-color: white;
+  border-radius: 8px;
+  font-weight: 400;
+}
+
+.my-message {
+  margin-left: auto;
+  flex-direction: row-reverse;
+  text-align: end;
+}
+
+.other-messages {
+  margin-right: auto;
+}
+
+.chat-message-author {
+  font-weight: 500;
+  margin-bottom: 6px;
+  margin-left: 3px;
+  margin-right: 10px;
+}
+
+.chat-message-avatar {
+  margin-top: calc(1.4rem + 6px);
+}

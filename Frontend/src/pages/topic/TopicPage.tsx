@@ -2,6 +2,7 @@ import Typography from '@mui/material/Typography';
 import { Box } from '@mui/system';
 import { useEffect, useState } from 'react';
 import { useLocation } from 'react-router';
+import Chat from '../../components/chat/Chat';
 import PostFeed from '../../components/postFeed/PostFeed';
 import Search from '../../components/search/Search';
 import PostFeedData from '../../models/post.feed.dto';
@@ -25,19 +26,34 @@ function TopicPage() {
 
   return (
     <>
-      <Box sx={{ display: 'flex', justifyContent: 'center', mt: 8 }}>
-        <Box
-          sx={{ display: 'flex', flexDirection: 'column', alignItems: 'center' }}
-        >
-          <Typography variant="h6" color="primary">
-           <strong> {topic.title}</strong>
-          </Typography>
-          <Typography variant="body1" color="primary">
-            {topic.description}
-          </Typography>
-        </Box>
+      <Box
+        sx={{
+          display: 'flex',
+          justifyContent: 'space-evenly',
+          flexDirection: 'row',
+        }}
+      >
+        <div>
+          <Box sx={{ display: 'flex', justifyContent: 'center', mt: 8 }}>
+            <Box
+              sx={{
+                display: 'flex',
+                flexDirection: 'column',
+                alignItems: 'center',
+              }}
+            >
+              <Typography variant="h6" color="primary">
+                <strong> {topic.title}</strong>
+              </Typography>
+              <Typography variant="body1" color="primary">
+                {topic.description}
+              </Typography>
+            </Box>
+          </Box>
+          <PostFeed feed={feed} setFeed={setFeed} />
+        </div>
+        <Chat />
       </Box>
-      <PostFeed feed={feed} setFeed={setFeed} />
       <Search />
     </>
   );
