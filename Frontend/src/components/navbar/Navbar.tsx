@@ -27,9 +27,11 @@ function Navbar() {
   const [requests, setRequests] = useState<User[]>([]);
 
   useEffect(() => {
-    getFriendRequests()
-      .then(({ data }) => setRequests(data))
-      .catch(({ error }) => console.log(error));
+    if (pathname !== '/' && pathname !== '/register') {
+      getFriendRequests()
+        .then(({ data }) => setRequests(data))
+        .catch(({ error }) => console.log(error));
+    }
   }, [pathname]);
 
   return pathname !== '/' && pathname !== '/register' ? (
