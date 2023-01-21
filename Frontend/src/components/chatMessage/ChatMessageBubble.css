@@ -8,11 +8,11 @@
 }
 
 .chat-message {
-  color: darkblue;
+  color: rgb(21, 101, 192);
   padding: 1rem;
   background-color: white;
   border-radius: 8px;
-  font-weight: 400;
+  font-weight: 500;
 }
 
 .my-message {
@@ -27,11 +27,11 @@
 
 .chat-message-author {
   font-weight: 500;
-  margin-bottom: 6px;
+  margin-bottom: 4px;
   margin-left: 3px;
   margin-right: 10px;
 }
 
 .chat-message-avatar {
-  margin-top: calc(1.4rem + 6px);
+  margin-top: calc(1.4rem + 2px);
 }
