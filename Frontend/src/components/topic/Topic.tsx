@@ -31,7 +31,7 @@ function Topic({ feedEl }: TopicProps) {
 
   return (
     <Card
-      sx={{ maxWidth: 800, minWidth: 700, mt: 5, bgcolor: 'primary.light' }}
+      sx={{ width: 700, mt: 5, bgcolor: 'primary.light' }}
     >
       <CardHeader
         title={

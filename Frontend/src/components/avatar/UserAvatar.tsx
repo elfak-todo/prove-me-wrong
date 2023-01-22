@@ -29,9 +29,9 @@ export function stringAvatar(name: string, size: number) {
       fontSize: size / 2,
       cursor: 'pointer',
     },
-    children: `${name.split(' ')[0][0].toLocaleUpperCase()}${name
+    children: `${name.split(' ')[0][0]?.toLocaleUpperCase()}${name
       .split(' ')[1][0]
-      .toLocaleUpperCase()}`,
+      ?.toLocaleUpperCase()}`,
   };
 }
 

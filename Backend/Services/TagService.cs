@@ -40,6 +40,8 @@ public class TagService : ITagService
 
     public async void CreateDefaultAsync()
     {
+        if(!_client.IsConnected) await _client.ConnectAsync();
+
         await Create(new Tag { Name = "Programiranje" });
         await Create(new Tag { Name = "Sport" });
         await Create(new Tag { Name = "Politika" });

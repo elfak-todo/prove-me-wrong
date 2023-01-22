@@ -30,6 +30,20 @@ npm run start
 
 Prilikom prvog pokretanja generisaće se test podaci.
 
+## Preview
+![alt text](assets\Screenshot_7.jpg)
+![alt text](assets\Screenshot_8.jpg)
+![alt text](assets\Screenshot_4.jpg)
+![alt text](assets\Screenshot_3.jpg)
+![alt text](assets\Screenshot_2.jpg)
+![alt text](assets\Screenshot_9.jpg)
+![alt text](assets\Screenshot_5.jpg)
+![alt text](assets\Screenshot_15.jpg)
+![alt text](assets\Screenshot_16.jpg)
+![alt text](assets\Screenshot_10.jpg)
+![alt text](assets\Screenshot_11.jpg)
+![alt text](assets\Screenshot_12.jpg)
+
 ## Redis
 
 ## Neo4j
