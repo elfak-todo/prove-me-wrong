@@ -10,7 +10,7 @@ Tim //TODO
 
 ## Pokretanje
 
-Pre pokretanja projekta pokrenuti Redis i Neo4j baze na portovima **6079** i **7687**, respektivno. Podrazumevani neo4j korisnik je _neo4j_ sa lozinkom _neo4jneo4j_.
+Pre pokretanja projekta pokrenuti Redis i Neo4j baze na portovima **6079** i **7687**, respektivno.Podrazumevani neo4j korisnik je _neo4j_ sa lozinkom _neo4jneo4j_.
 
 Backend:
 
@@ -27,6 +27,8 @@ cd Frontend
 npm i
 npm run start
 ```
+
+Prilikom prvog pokretanja generisaće se test podaci.
 
 ## Redis
 
