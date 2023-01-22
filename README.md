@@ -51,50 +51,50 @@ Redis je u projektu korišćen:
 
 ## Preview
 
-## Prijavljivanje
+### Prijavljivanje
 
 ![Prijava](/assets/Screenshot_7.jpg)
 
-## Registracija
+### Registracija
 
 ![Registracija](/assets/Screenshot_8.jpg)
 
-## Početna stranica
+### Početna stranica
 
 ![Početna stranica](/assets/Screenshot_4.jpg)
 
-## Zahtevi za prijateljstvo
+### Zahtevi za prijateljstvo
 
 ![Obaveštenja](/assets/Screenshot_3.jpg)
 
-## Pretraga korisnika
+### Pretraga korisnika
 
 ![Pretraga korisnika](/assets/Screenshot_2.jpg)
 
-## Filtriranje tema
+### Filtriranje tema
 
 ![Filtriranje tema](/assets/Screenshot_9.jpg)
 
-## Kreiranje teme
+### Kreiranje teme
 
 ![Kreiranje teme](/assets/Screenshot_5.jpg)
 
-## Objave i komentari na temu
+### Objave i komentari na temu
 
 ![Objave i komentari](/assets/Screenshot_16.jpg)
 
-## Ćaskanje
+### Ćaskanje
 
 ![Ćaskanje](/assets/Screenshot_15.jpg)
 
-## Kreiranje Objave
+### Kreiranje Objave
 
 ![Kreiranje teme](/assets/Screenshot_10.jpg)
 
-## Podešavanje interesovanja na profilu
+### Podešavanje interesovanja na profilu
 
 ![Interesovanja](/assets/Screenshot_11.jpg)
 
-## Profil korisnika
+### Profil korisnika
 
 ![Profil](/assets/Screenshot_12.jpg)
