@@ -26,34 +26,26 @@ function TopicPage() {
 
   return (
     <>
-      <Box
-        sx={{
-          display: 'flex',
-          justifyContent: 'space-evenly',
-          flexDirection: 'row',
-        }}
-      >
-        <div>
-          <Box sx={{ display: 'flex', justifyContent: 'center', mt: 8 }}>
-            <Box
-              sx={{
-                display: 'flex',
-                flexDirection: 'column',
-                alignItems: 'center',
-              }}
-            >
-              <Typography variant="h6" color="primary">
-                <strong> {topic.title}</strong>
-              </Typography>
-              <Typography variant="body1" color="primary">
-                {topic.description}
-              </Typography>
-            </Box>
+      <div>
+        <Box sx={{ display: 'flex', justifyContent: 'center', mt: 8 }}>
+          <Box
+            sx={{
+              display: 'flex',
+              flexDirection: 'column',
+              alignItems: 'center',
+            }}
+          >
+            <Typography variant="h6" color="primary">
+              <strong> {topic.title}</strong>
+            </Typography>
+            <Typography variant="body1" color="primary">
+              {topic.description}
+            </Typography>
           </Box>
-          <PostFeed feed={feed} setFeed={setFeed} />
-        </div>
-        <Chat />
-      </Box>
+        </Box>
+        <PostFeed feed={feed} setFeed={setFeed} />
+      </div>
+      <Chat />
       <Search />
     </>
   );

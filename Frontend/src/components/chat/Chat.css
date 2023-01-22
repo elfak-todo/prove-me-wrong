@@ -10,6 +10,7 @@
   flex-direction: column;
   justify-content: stretch;
   color: rgb(21, 101, 192);
+  font-size: smaller;
 }
 
 .chat-container > h2 {
