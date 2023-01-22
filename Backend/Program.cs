@@ -9,7 +9,7 @@ builder.Services.AddControllers();
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
 
-// Neo4j
+// [Neo4j]
 
 var neo4jClient = new BoltGraphClient(builder.Configuration["Neo4j:ConnectionString"]!,
         builder.Configuration["Neo4j:Username"]!,
@@ -17,20 +17,24 @@ var neo4jClient = new BoltGraphClient(builder.Configuration["Neo4j:ConnectionStr
 neo4jClient.ConnectAsync();
 builder.Services.AddSingleton<IGraphClient>(neo4jClient);
 
-// Redis
+// [Redis]
 
 var redisClient = ConnectionMultiplexer.Connect(builder.Configuration["Redis:ConnectionString"]!);
 builder.Services.AddSingleton<IConnectionMultiplexer>(redisClient);
 
 builder.Services.AddSignalR();
 
-// Services
+// [Services]
 
+//Kreira inicijalne tagove ako vec nisu kreirani.
+var tagService = new TagService(neo4jClient);
+tagService.CreateDefaultAsync();
+
+builder.Services.AddSingleton<ITagService>(tagService);
 builder.Services.AddScoped<IUserService, UserService>();
 builder.Services.AddScoped<IPasswordManager, PasswordManager>();
 builder.Services.AddScoped<ITopicService, TopicService>();
 builder.Services.AddScoped<IPostService, PostService>();
-builder.Services.AddScoped<ITagService, TagService>();
 builder.Services.AddScoped<ICommentService, CommentService>();
 
 builder.Services.AddCors(options =>
