@@ -30,7 +30,18 @@ npm run start
 
 Prilikom prvog pokretanja generisaće se test podaci.
 
+## Redis
+
+Redis je u projektu korišćen:
+
+1. Za ćaskanje, uz pomoć Publisher / Subscriber modela
+2. Za čuvanje komentara objava
+3. Za čuvanje sesija
+
+## Neo4j
+
 ## Preview
+
 ![Prijava](/assets/Screenshot_7.jpg)
 ![Registracija](/assets/Screenshot_8.jpg)
 ![Početna stranica](/assets/Screenshot_4.jpg)
@@ -43,7 +54,3 @@ Prilikom prvog pokretanja generisaće se test podaci.
 ![Komentari](/assets/Screenshot_10.jpg)
 ![Interesovanja](/assets/Screenshot_11.jpg)
 ![Profil](/assets/Screenshot_12.jpg)
-
-## Redis
-
-## Neo4j
