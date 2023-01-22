@@ -2,6 +2,9 @@ using Backend.Services;
 using StackExchange.Redis;
 using Neo4jClient;
 using Backend.Hubs;
+using Microsoft.AspNetCore.SignalR;
+using Backend.Models;
+using System.Text.Json;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -9,7 +12,7 @@ builder.Services.AddControllers();
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
 
-// Neo4j
+// [Neo4j]
 
 var neo4jClient = new BoltGraphClient(builder.Configuration["Neo4j:ConnectionString"]!,
         builder.Configuration["Neo4j:Username"]!,
@@ -17,21 +20,26 @@ var neo4jClient = new BoltGraphClient(builder.Configuration["Neo4j:ConnectionStr
 neo4jClient.ConnectAsync();
 builder.Services.AddSingleton<IGraphClient>(neo4jClient);
 
-// Redis
+// [Redis]
 
 var redisClient = ConnectionMultiplexer.Connect(builder.Configuration["Redis:ConnectionString"]!);
 builder.Services.AddSingleton<IConnectionMultiplexer>(redisClient);
 
 builder.Services.AddSignalR();
 
-// Services
+// [Services]
 
+//Kreira inicijalne tagove ako vec nisu kreirani.
+var tagService = new TagService(neo4jClient);
+tagService.CreateDefaultAsync();
+
+builder.Services.AddSingleton<ITagService>(tagService);
 builder.Services.AddScoped<IUserService, UserService>();
 builder.Services.AddScoped<IPasswordManager, PasswordManager>();
 builder.Services.AddScoped<ITopicService, TopicService>();
 builder.Services.AddScoped<IPostService, PostService>();
-builder.Services.AddScoped<ITagService, TagService>();
 builder.Services.AddScoped<ICommentService, CommentService>();
+builder.Services.AddScoped<IChatService, ChatService>();
 
 builder.Services.AddCors(options =>
 {
@@ -74,5 +82,26 @@ app.MapControllers();
 app.UseCors("CORS");
 app.UseHttpsRedirection();
 app.UseMiddleware<AuthMiddleware>();
+
+using var serviceScope = app.Services.GetRequiredService<IServiceScopeFactory>().CreateScope();
+
+var chatHub = serviceScope.ServiceProvider.GetService<IHubContext<ChatHub>>();
+
+var channel = redisClient.GetSubscriber().Subscribe("MESSAGES");
+channel.OnMessage(async (message) =>
+{
+    try
+    {
+        var mess = JsonSerializer.Deserialize<PubSubMessage>(message.Message.ToString());
+        if (mess != null && chatHub != null)
+        {
+            await chatHub.Clients.All.SendAsync(mess.Type, mess.Data);
+        }
+    }
+    catch (Exception e)
+    {
+        Console.WriteLine($"Error: {e} ");
+    }
+});
 
 app.Run();

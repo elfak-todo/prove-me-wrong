@@ -27,12 +27,27 @@ public class TagService : ITagService
 
     public async Task<Tag> Create(Tag tagData)
     {
-        tagData.ID = Guid.NewGuid().ToString();
-        
-        var newTag = await _client.Cypher.Create("(tag:Tag $tagData)")
-                                    .WithParam("tagData", tagData)
-                                    .Return(tag => tag.As<Tag>()).ResultsAsync;
+        var newTag = await _client.Cypher.Merge("(tag:Tag {Name: $tagData.Name})")
+                                    .OnCreate()
+                                        .Set("tag = $tagData")
+                                        .Set("tag.ID = $tagId")
+                                    .WithParams(new { tagData, tagId = Guid.NewGuid().ToString() })
+                                    .Return(tag => tag.As<Tag>())
+                                    .ResultsAsync;
 
         return newTag.Single();
+    }
+
+    public async void CreateDefaultAsync()
+    {
+        await Create(new Tag { Name = "Programiranje" });
+        await Create(new Tag { Name = "Sport" });
+        await Create(new Tag { Name = "Politika" });
+        await Create(new Tag { Name = "Hrana" });
+        await Create(new Tag { Name = "Nauka" });
+        await Create(new Tag { Name = "Putovanja" }); 
+        await Create(new Tag { Name = "Filmovi" }); 
+        await Create(new Tag { Name = "Serije" });
+        await Create(new Tag { Name = "Fakultet" });
     }
 }
