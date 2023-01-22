@@ -2,6 +2,9 @@ using Backend.Services;
 using StackExchange.Redis;
 using Neo4jClient;
 using Backend.Hubs;
+using Microsoft.AspNetCore.SignalR;
+using Backend.Models;
+using System.Text.Json;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -32,6 +35,7 @@ builder.Services.AddScoped<ITopicService, TopicService>();
 builder.Services.AddScoped<IPostService, PostService>();
 builder.Services.AddScoped<ITagService, TagService>();
 builder.Services.AddScoped<ICommentService, CommentService>();
+builder.Services.AddScoped<IChatService, ChatService>();
 
 builder.Services.AddCors(options =>
 {
@@ -74,5 +78,26 @@ app.MapControllers();
 app.UseCors("CORS");
 app.UseHttpsRedirection();
 app.UseMiddleware<AuthMiddleware>();
+
+using var serviceScope = app.Services.GetRequiredService<IServiceScopeFactory>().CreateScope();
+
+var chatHub = serviceScope.ServiceProvider.GetService<IHubContext<ChatHub>>();
+
+var channel = redisClient.GetSubscriber().Subscribe("MESSAGES");
+channel.OnMessage(async (message) =>
+{
+    try
+    {
+        var mess = JsonSerializer.Deserialize<PubSubMessage>(message.Message.ToString());
+        if (mess != null && chatHub != null)
+        {
+            await chatHub.Clients.All.SendAsync(mess.Type, mess.Data);
+        }
+    }
+    catch (Exception e)
+    {
+        Console.WriteLine($"Error: {e} ");
+    }
+});
 
 app.Run();

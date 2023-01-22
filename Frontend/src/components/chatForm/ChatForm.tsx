@@ -1,16 +1,22 @@
 import { TextField } from '@mui/material';
-import { Dispatch, FC, SetStateAction, useContext, useRef } from 'react';
+import { FC, useContext, useRef } from 'react';
+import { useLocation } from 'react-router';
 import { ChatMessage } from '../../models/chat-message';
+import { ChatMessageDto } from '../../models/chat-message.dto';
+import { ITopic } from '../../models/topic';
 import UserContext from '../userManager/UserManager';
 
 import './ChatForm.css';
 
 interface Props {
-  setChatMessages: Dispatch<SetStateAction<ChatMessage[]>>;
+  sendMessage: (message: ChatMessageDto) => void;
 }
 
-const ChatForm: FC<Props> = ({ setChatMessages }) => {
+const ChatForm: FC<Props> = ({ sendMessage }) => {
   const { user } = useContext(UserContext);
+
+  const { state } = useLocation();
+  const topic: ITopic = state;
 
   const textFieldRef = useRef<HTMLTextAreaElement>(null);
 
@@ -19,15 +25,14 @@ const ChatForm: FC<Props> = ({ setChatMessages }) => {
     if (!user || !msgText) return;
 
     const newMessage: ChatMessage = {
-      id: 'sd',
-      author: user,
-      text: msgText,
+      from: user,
+      message: msgText,
       myMessage: true,
-      timeSent: new Date(),
+      date: Date.now(),
+      roomId: topic.id!,
     };
 
-    setChatMessages((state) => [newMessage, ...state]);
-
+    sendMessage(newMessage);
     textFieldRef.current.value = '';
   };
 

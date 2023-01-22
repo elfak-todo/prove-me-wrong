@@ -16,19 +16,19 @@ const ChatMessageBubble: FC<Props> = ({ message }) => {
     >
       <div className="chat-message-avatar">
         <UserAvatar
-          name={`${message.author.firstName} ${message.author.lastName}`}
+          name={`${message.from.firstName} ${message.from.lastName}`}
           size={24}
         />
       </div>
       <div>
         <div className="chat-message-author">
-          {message.author.firstName} {message.author.lastName}
+          {message.from.firstName} {message.from.lastName}
         </div>
-        <div className="chat-message">{message.text}</div>
+        <div className="chat-message">{message.message}</div>
         <div className="chat-message-time">
-          {new Date(message.timeSent).getHours() +
+          {new Date(message.date).getHours() +
             ':' +
-            new Date(message.timeSent).getMinutes()}
+            new Date(message.date).getMinutes()}
         </div>
       </div>
     </div>
