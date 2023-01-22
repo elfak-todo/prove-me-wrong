@@ -31,18 +31,18 @@ npm run start
 Prilikom prvog pokretanja generisaće se test podaci.
 
 ## Preview
-![alt text](assets\Screenshot_7.jpg)
-![alt text](assets\Screenshot_8.jpg)
-![alt text](assets\Screenshot_4.jpg)
-![alt text](assets\Screenshot_3.jpg)
-![alt text](assets\Screenshot_2.jpg)
-![alt text](assets\Screenshot_9.jpg)
-![alt text](assets\Screenshot_5.jpg)
-![alt text](assets\Screenshot_15.jpg)
-![alt text](assets\Screenshot_16.jpg)
-![alt text](assets\Screenshot_10.jpg)
-![alt text](assets\Screenshot_11.jpg)
-![alt text](assets\Screenshot_12.jpg)
+![Prijava](/assets/Screenshot_7.jpg)
+![Registracija](/assets/Screenshot_8.jpg)
+![Početna stranica](/assets/Screenshot_4.jpg)
+![Obaveštenja](/assets/Screenshot_3.jpg)
+![Pretraga korisnika](/assets/Screenshot_2.jpg)
+![Filtriranje tema](/assets/Screenshot_9.jpg)
+![Kreiranje teme](/assets/Screenshot_5.jpg)
+![Kreiranje objave](/assets/Screenshot_15.jpg)
+![Ćaskanje](/assets/Screenshot_16.jpg)
+![Komentari](/assets/Screenshot_10.jpg)
+![Interesovanja](/assets/Screenshot_11.jpg)
+![Profil](/assets/Screenshot_12.jpg)
 
 ## Redis
 
