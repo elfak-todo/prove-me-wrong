@@ -1,0 +1,19 @@
+.chat-message-list {
+  overflow: hidden scroll;
+  flex-grow: 1;
+  scrollbar-color: rgb(154, 201, 255);
+  display: flex;
+  flex-direction: column-reverse;
+}
+
+.chat-message-list::-webkit-scrollbar {
+  background: rgb(154, 201, 255);
+}
+
+.chat-message-list::-webkit-scrollbar-corner {
+  background: rgb(124, 184, 253);
+}
+
+.chat-message-list::-webkit-scrollbar-thumb {
+  background: rgb(124, 184, 253);
+}
