@@ -19,7 +19,7 @@ function Create({ Form, feed, setFeed }: CreateProps) {
       <Fab
         sx={{
           position: 'fixed',
-          top: '5rem',
+          bottom: 10,
           left: 10,
         }}
         color="primary"
