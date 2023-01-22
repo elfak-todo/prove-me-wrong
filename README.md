@@ -37,8 +37,6 @@ npm i
 npm run start
 ```
 
-Prilikom prvog pokretanja generisaće se test podaci.
-
 ## Redis
 
 Redis je u projektu korišćen:
@@ -48,6 +46,13 @@ Redis je u projektu korišćen:
 3. Za čuvanje sesija
 
 ## Neo4j
+
+Neo4j je u projektu korišćen:
+
+1. Za čuvanje tema, objava i korisnika
+2. Za pretragu korisnika po imenu i prezimenu ili korisničkom imenu
+3. Za relaciju prijateljstva između korisnika
+4. Za filtriranje tema po interesovanjima korisnika.
 
 ## Preview
 
