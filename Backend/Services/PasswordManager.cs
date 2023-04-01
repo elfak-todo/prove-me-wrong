@@ -5,8 +5,8 @@ namespace Backend.Services;
 
 public interface IPasswordManager
 {
-    public string HashPassword(string password);
-    public bool VerifyPassword(string? password, string? hashedPassword);
+    string HashPassword(string password);
+    bool VerifyPassword(string? password, string? hashedPassword);
 }
 
 public class PasswordManager : IPasswordManager

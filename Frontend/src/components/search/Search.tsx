@@ -1,7 +1,7 @@
 import { Autocomplete, Box, Paper, TextField, Typography } from '@mui/material';
 import { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router';
-import useDebounce from '../../debaunce';
+import useDebounce from '../../debounce';
 import User from '../../models/user';
 import { searchUsers } from '../../services/user.service';
 import UserAvatar from '../avatar/UserAvatar';
